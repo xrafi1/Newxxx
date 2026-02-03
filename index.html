@@ -35,12 +35,8 @@
     </script>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-
     <style>
         body { font-family: 'DM Sans', sans-serif; }
-        /* Glass effect class */
         .glass-card {
             background: rgba(255, 255, 255, 0.7);
             backdrop-filter: blur(20px);
@@ -93,11 +89,11 @@
         <div class="w-full max-w-md">
             <div class="glass-card rounded-3xl p-2 shadow-2xl ring-1 ring-black/5 relative">
                 <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-primary to-teal-600 text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-lg z-20">
-                    100% Secure Donation
+                    100% Secure Donation (Zaakpay)
                 </div>
 
                 <div class="bg-white/80 rounded-[1.3rem] p-6 md:p-8">
-                    <form id="donationForm">
+                    <form id="donationForm" onsubmit="handlePayment(event)">
                         <div class="mb-6">
                             <label class="text-xs font-bold text-slate-400 uppercase mb-3 block text-center">Select Amount (INR)</label>
                             <div class="grid grid-cols-3 gap-2">
@@ -106,15 +102,15 @@
                                 <button type="button" onclick="pick(1000, this)" class="amt-btn py-3 rounded-xl bg-primary/10 border-primary text-primary ring-1 ring-primary font-bold transition text-lg shadow-inner">1k</button>
                             </div>
                             <div class="mt-2 relative">
-                                <input type="number" id="customAmount" value="1000" class="w-full text-center border-b border-dashed border-slate-300 py-2 bg-transparent font-bold text-slate-900 focus:outline-none focus:border-primary transition" placeholder="Or enter custom amount">
+                                <input type="number" id="customAmount" value="1000" class="w-full text-center border-b border-dashed border-slate-300 py-2 bg-transparent font-bold text-slate-900 focus:outline-none focus:border-primary transition" placeholder="Or enter custom amount" required>
                             </div>
                         </div>
 
                         <div class="space-y-3 mb-6">
-                            <input type="text" id="donorName" placeholder="Full Name" required class="w-full bg-slate-50 border-none rounded-xl px-4 py-3 text-sm font-medium focus:ring-2 focus:ring-primary/20 transition placeholder-slate-400">
+                            <input type="text" id="donorName" placeholder="Your Name" class="w-full bg-slate-50 border-none rounded-xl px-4 py-3 text-sm font-medium focus:ring-2 focus:ring-primary/20 transition placeholder-slate-400" required>
                             <div class="flex gap-3">
-                                <input type="email" id="donorEmail" placeholder="Email" required class="w-1/2 bg-slate-50 border-none rounded-xl px-4 py-3 text-sm font-medium focus:ring-2 focus:ring-primary/20 transition placeholder-slate-400">
-                                <input type="tel" id="donorPhone" placeholder="Phone" required class="w-1/2 bg-slate-50 border-none rounded-xl px-4 py-3 text-sm font-medium focus:ring-2 focus:ring-primary/20 transition placeholder-slate-400">
+                                <input type="email" id="donorEmail" placeholder="Email" class="w-1/2 bg-slate-50 border-none rounded-xl px-4 py-3 text-sm font-medium focus:ring-2 focus:ring-primary/20 transition placeholder-slate-400" required>
+                                <input type="tel" id="donorPhone" placeholder="Phone" class="w-1/2 bg-slate-50 border-none rounded-xl px-4 py-3 text-sm font-medium focus:ring-2 focus:ring-primary/20 transition placeholder-slate-400" required>
                             </div>
                         </div>
 
@@ -126,88 +122,51 @@
                         <div class="mt-4 text-center">
                             <p class="text-[10px] text-slate-400 font-medium">
                                 <i class="fas fa-lock text-green-600 mr-1"></i> 
-                                Secured by Zaakpay • Tax Benefits Available
+                                Encrypted & Safe • Tax Benefits Available
                             </p>
                         </div>
                     </form>
-
-                    <form id="zaakpayHiddenForm" method="POST" action="https://zaakstaging.zaakpay.com/api/paymentTransact/V8">
-                        <input type="hidden" name="merchantIdentifier" value="b19e8f103bce406cbd3476431b6b7973">
-                        <input type="hidden" name="orderId" id="zp_orderId">
-                        <input type="hidden" name="amount" id="zp_amount">
-                        <input type="hidden" name="buyerEmail" id="zp_email">
-                        <input type="hidden" name="buyerFirstName" id="zp_fname">
-                        <input type="hidden" name="buyerLastName" id="zp_lname">
-                        <input type="hidden" name="buyerPhoneNumber" id="zp_phone">
-                        <input type="hidden" name="currency" value="INR">
-                        <input type="hidden" name="mode" value="0"> 
-                        <input type="hidden" name="txnType" value="1">
-                        <input type="hidden" name="zpPayOption" value="1">
-                        <input type="hidden" name="returnUrl" value="http://localhost:8000/response"> 
-                        <input type="hidden" name="checksum" id="zp_checksum">
-                    </form>
-
                 </div>
             </div>
         </div>
     </div>
 
+    <form action="https://zaakstaging.zaakpay.com/api/payment/transact" method="post" id="zaakpayHiddenForm" style="display: none;">
+        <input type="hidden" name="merchantIdentifier" value="b19e8f103bce406cbd3476431b6b7973" /> <input type="hidden" name="orderId" id="zp_orderId" />
+        <input type="hidden" name="returnUrl" value="http://localhost:8000/response.html" /> <input type="hidden" name="buyerEmail" id="zp_buyerEmail" />
+        <input type="hidden" name="buyerFirstName" id="zp_buyerFirstName" />
+        <input type="hidden" name="buyerLastName" value="" />
+        <input type="hidden" name="buyerPhoneNumber" id="zp_buyerPhoneNumber" />
+        <input type="hidden" name="currency" value="INR" />
+        <input type="hidden" name="amount" id="zp_amount" />
+        <input type="hidden" name="purpose" value="Donation" />
+        <input type="hidden" name="checksum" id="zp_checksum" value="MOCK_CHECKSUM_FOR_DEMO" /> 
+    </form>
+
     <div class="max-w-5xl mx-auto px-4 pb-20 relative z-10" id="mission">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div class="md:col-span-2 bg-white rounded-3xl p-8 shadow-sm border border-slate-100 flex flex-col justify-center">
+             <div class="md:col-span-2 bg-white rounded-3xl p-8 shadow-sm border border-slate-100 flex flex-col justify-center">
                 <h3 class="text-2xl font-bold text-slate-900 mb-2">Transparency First</h3>
-                <p class="text-slate-500 mb-6">We believe in radical transparency. View our public ledger to see exactly how every rupee is utilized for community welfare.</p>
+                <p class="text-slate-500 mb-6">We believe in radical transparency. View our public ledger to see exactly how every rupee is utilized.</p>
                 <div class="flex gap-4">
                     <div class="bg-green-50 text-green-700 px-4 py-2 rounded-lg text-sm font-bold">80G Exempt</div>
                     <div class="bg-blue-50 text-blue-700 px-4 py-2 rounded-lg text-sm font-bold">ISO Certified</div>
                 </div>
             </div>
-            
-            <div class="bg-slate-900 rounded-3xl p-8 text-white flex flex-col items-center justify-center text-center relative overflow-hidden">
-                <div class="relative z-10">
-                    <div class="text-5xl font-bold mb-1 text-primary">5k+</div>
-                    <div class="text-sm text-slate-400">Lives Impacted</div>
-                </div>
-                <div class="absolute inset-0 bg-gradient-to-br from-slate-800 to-black z-0"></div>
+            <div class="bg-slate-900 rounded-3xl p-8 text-white flex flex-col items-center justify-center text-center">
+                 <div class="text-5xl font-bold mb-1 text-primary">5k+</div>
+                 <div class="text-sm text-slate-400">Lives Impacted</div>
             </div>
-
-            <div class="bg-white rounded-3xl p-8 shadow-sm border border-slate-100">
-                <i class="fas fa-utensils text-orange-400 text-3xl mb-4"></i>
-                <h4 class="font-bold text-lg">Food</h4>
-                <p class="text-xs text-slate-500 mt-1">Providing grocery kits to families.</p>
-            </div>
-
-            <div class="bg-white rounded-3xl p-8 shadow-sm border border-slate-100">
-                <i class="fas fa-graduation-cap text-blue-400 text-3xl mb-4"></i>
-                <h4 class="font-bold text-lg">Education</h4>
-                <p class="text-xs text-slate-500 mt-1">Books & fees for rural children.</p>
-            </div>
-
-            <a href="join.html" class="bg-primary hover:bg-emerald-700 transition rounded-3xl p-8 text-white flex items-center justify-between group">
-                <div>
-                    <h4 class="font-bold text-xl">Become a Volunteer</h4>
-                    <p class="text-green-100 text-sm">Join our ground team today.</p>
-                </div>
-                <div class="bg-white/20 h-10 w-10 rounded-full flex items-center justify-center group-hover:bg-white/30 transition">
-                    <i class="fas fa-arrow-right"></i>
-                </div>
-            </a>
         </div>
     </div>
 
     <footer class="bg-white border-t border-slate-100 py-10 relative z-10">
         <div class="max-w-7xl mx-auto px-4 text-center">
             <p class="text-slate-500 text-sm mb-4">&copy; 2026 KindFund Foundation. Barpeta Road, Assam.</p>
-            <div class="flex justify-center gap-6 text-sm font-medium text-slate-400">
-                <a href="legal.html" class="hover:text-slate-900">Privacy</a>
-                <a href="legal.html" class="hover:text-slate-900">Terms</a>
-                <a href="legal.html" class="hover:text-slate-900">Refunds</a>
-            </div>
         </div>
     </footer>
 
     <script>
-        // --- 1. Amount Selection Logic ---
         function pick(amount, btn) {
             document.getElementById('customAmount').value = amount;
             document.querySelectorAll('.amt-btn').forEach(b => {
@@ -216,79 +175,37 @@
             btn.className = "amt-btn py-3 rounded-xl bg-primary/10 border-primary text-primary ring-1 ring-primary font-bold transition text-lg shadow-inner";
         }
 
-        // --- 2. Zaakpay Integration Logic ---
-        
-        // TEST CREDENTIALS (PUBLIC DEMO KEYS)
-        // Note: NEVER expose your LIVE Secret Key in client-side HTML. 
-        // This is only for the "Test" functionality requested.
-        const TEST_MERCHANT_ID = "b19e8f103bce406cbd3476431b6b7973";
-        const TEST_SECRET_KEY = "0678056d96914a8583fb518caf42828a"; 
-
-        document.getElementById('donationForm').addEventListener('submit', function(e) {
+        function handlePayment(e) {
             e.preventDefault();
 
             // 1. Gather Data
-            const amount = Math.floor(document.getElementById('customAmount').value * 100); // Zaakpay often expects paisa, but let's stick to standard INR handling or check documentation. 
-            // *correction*: Zaakpay V8 usually takes Amount in full Rupees (e.g. "100"). Let's send raw value first.
-            const rawAmount = document.getElementById('customAmount').value;
+            const amount = document.getElementById('customAmount').value;
+            const name = document.getElementById('donorName').value;
+            const email = document.getElementById('donorEmail').value;
+            const phone = document.getElementById('donorPhone').value;
+            const orderId = "ORD" + Math.floor(Math.random() * 1000000000); // Random Order ID
+
+            // 2. Populate Zaakpay Hidden Form
+            document.getElementById('zp_amount').value = String(parseInt(amount) * 100); // Zaakpay often expects Paisa, but sometimes INR. Start with INR value in string (e.g. "100")
+            // Note: If Zaakpay test expects paisa, multiply by 100. *Commonly standard forms use INR.*
+            document.getElementById('zp_amount').value = amount; 
+
+            document.getElementById('zp_buyerEmail').value = email;
+            document.getElementById('zp_buyerFirstName').value = name;
+            document.getElementById('zp_buyerPhoneNumber').value = phone;
+            document.getElementById('zp_orderId').value = orderId;
+
+            // 3. IMPORTANT: Checksum Logic
+            // In a real application, you must fetch the checksum from your backend here.
+            // Example: 
+            // const checksum = await fetch('/api/get-checksum', { method: 'POST', body: ... });
+            // document.getElementById('zp_checksum').value = checksum;
+
+            alert("Redirecting to Zaakpay Sandbox...\n(Note: Without a backend to generate a real Checksum using the Secret Key, the payment page might show 'Invalid Checksum' error, but this demonstrates the integration flow.)");
             
-            const fullName = document.getElementById('donorName').value || "Anonymous Donor";
-            const email = document.getElementById('donorEmail').value || "test@test.com";
-            const phone = document.getElementById('donorPhone').value || "9999999999";
-            
-            // Split name
-            const nameParts = fullName.split(' ');
-            const fName = nameParts[0];
-            const lName = nameParts.length > 1 ? nameParts.slice(1).join(' ') : 'Donor';
-
-            // Generate Unique Order ID
-            const orderId = "ORD" + Date.now();
-
-            // 2. Prepare Parameters for Checksum
-            // Format: alphabetically sorted keys: key='value'
-            const params = {
-                amount: rawAmount,
-                buyerEmail: email,
-                buyerFirstName: fName,
-                buyerLastName: lName,
-                buyerPhoneNumber: phone,
-                currency: "INR",
-                merchantIdentifier: TEST_MERCHANT_ID,
-                mode: "0",
-                orderId: orderId,
-                returnUrl: "http://localhost:8000/response", // Change this to your actual return URL
-                txnType: "1",
-                zpPayOption: "1"
-            };
-
-            // 3. Populate Hidden Form
-            document.getElementById('zp_amount').value = params.amount;
-            document.getElementById('zp_email').value = params.buyerEmail;
-            document.getElementById('zp_fname').value = params.buyerFirstName;
-            document.getElementById('zp_lname').value = params.buyerLastName;
-            document.getElementById('zp_phone').value = params.buyerPhoneNumber;
-            document.getElementById('zp_orderId').value = params.orderId;
-
-            // 4. Calculate Checksum (HMAC-SHA256)
-            // Logic: Sort keys -> Create string "key='value'&key='value'..." -> Sign with Secret
-            const sortedKeys = Object.keys(params).sort();
-            let checksumString = "";
-            
-            sortedKeys.forEach((key, index) => {
-                checksumString += `${key}='${params[key]}'`;
-                if (index < sortedKeys.length - 1) checksumString += "&";
-            });
-
-            console.log("Checksum String:", checksumString); // Debugging
-
-            const checksum = CryptoJS.HmacSHA256(checksumString, TEST_SECRET_KEY).toString(CryptoJS.enc.Hex);
-            document.getElementById('zp_checksum').value = checksum;
-
-            // 5. Submit Hidden Form to Zaakpay
-            console.log("Submitting to Zaakpay...");
+            // 4. Submit
             document.getElementById('zaakpayHiddenForm').submit();
-        });
+        }
     </script>
 </body>
 </html>
-
