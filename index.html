@@ -36,11 +36,10 @@
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 
     <style>
         body { font-family: 'DM Sans', sans-serif; }
-        /* Glass effect class */
         .glass-card {
             background: rgba(255, 255, 255, 0.7);
             backdrop-filter: blur(20px);
@@ -60,7 +59,7 @@
     <nav class="relative z-50 pt-6 px-6">
         <div class="max-w-7xl mx-auto flex justify-between items-center glass-card rounded-full px-6 py-3 shadow-sm">
             <a href="#" class="flex items-center gap-2">
-                <img src="https://i.ibb.co/svMHRcFF/Green-Modern-Badge-Gardening-Logo-Design-20260202-115512-0000.png" class="h-10 w-auto rounded-full bg-white p-0.5">
+                <img src="https://i.ibb.co/svMHRcFF/Green-Modern-Badge-Gardening-Logo-Design-20260202-115512-0000.png" class="h-10 w-auto rounded-full bg-white p-0.5" alt="Logo">
                 <span class="font-bold text-lg tracking-tight text-primary">KindFund</span>
             </a>
             <div class="hidden md:flex gap-6 text-sm font-medium text-slate-600">
@@ -106,21 +105,21 @@
                                 <button type="button" onclick="pick(1000, this)" class="amt-btn py-3 rounded-xl bg-primary/10 border-primary text-primary ring-1 ring-primary font-bold transition text-lg shadow-inner">1k</button>
                             </div>
                             <div class="mt-2 relative">
-                                <input type="number" id="customAmount" value="1000" class="w-full text-center border-b border-dashed border-slate-300 py-2 bg-transparent font-bold text-slate-900 focus:outline-none focus:border-primary transition" placeholder="Or enter custom amount">
+                                <input type="number" id="customAmount" value="1000" required class="w-full text-center border-b border-dashed border-slate-300 py-2 bg-transparent font-bold text-slate-900 focus:outline-none focus:border-primary transition" placeholder="Or enter custom amount">
                             </div>
                         </div>
 
                         <div class="space-y-3 mb-6">
-                            <input type="text" id="donorName" placeholder="Your Name" required class="w-full bg-slate-50 border-none rounded-xl px-4 py-3 text-sm font-medium focus:ring-2 focus:ring-primary/20 transition placeholder-slate-400">
+                            <input type="text" id="donorName" required placeholder="Your Name" class="w-full bg-slate-50 border-none rounded-xl px-4 py-3 text-sm font-medium focus:ring-2 focus:ring-primary/20 transition placeholder-slate-400">
                             <div class="flex gap-3">
-                                <input type="email" id="donorEmail" placeholder="Email" required class="w-1/2 bg-slate-50 border-none rounded-xl px-4 py-3 text-sm font-medium focus:ring-2 focus:ring-primary/20 transition placeholder-slate-400">
-                                <input type="tel" id="donorPhone" placeholder="Phone" required class="w-1/2 bg-slate-50 border-none rounded-xl px-4 py-3 text-sm font-medium focus:ring-2 focus:ring-primary/20 transition placeholder-slate-400">
+                                <input type="email" id="donorEmail" required placeholder="Email" class="w-1/2 bg-slate-50 border-none rounded-xl px-4 py-3 text-sm font-medium focus:ring-2 focus:ring-primary/20 transition placeholder-slate-400">
+                                <input type="tel" id="donorPhone" required placeholder="Phone" class="w-1/2 bg-slate-50 border-none rounded-xl px-4 py-3 text-sm font-medium focus:ring-2 focus:ring-primary/20 transition placeholder-slate-400">
                             </div>
                         </div>
 
-                        <button type="submit" id="payButton" class="w-full bg-slate-900 text-white py-4 rounded-xl font-bold text-lg shadow-xl shadow-slate-900/20 hover:bg-black hover:shadow-2xl transition transform hover:-translate-y-0.5 flex justify-center items-center gap-2 group">
-                            <span>Donate Now</span>
-                            <i class="fas fa-heart text-red-500 animate-pulse-slow group-hover:scale-110 transition"></i>
+                        <button type="submit" id="payBtn" class="w-full bg-slate-900 text-white py-4 rounded-xl font-bold text-lg shadow-xl shadow-slate-900/20 hover:bg-black hover:shadow-2xl transition transform hover:-translate-y-0.5 flex justify-center items-center gap-2 group">
+                            <span id="btnText">Donate via PayU</span>
+                            <i id="btnIcon" class="fas fa-heart text-red-500 animate-pulse-slow group-hover:scale-110 transition"></i>
                         </button>
                         
                         <div class="mt-4 text-center">
@@ -190,7 +189,7 @@
     </footer>
 
     <script>
-        // Existing Amount Selection Logic
+        // UI Interaction for Amount Buttons
         function pick(amount, btn) {
             document.getElementById('customAmount').value = amount;
             document.querySelectorAll('.amt-btn').forEach(b => {
@@ -199,59 +198,76 @@
             btn.className = "amt-btn py-3 rounded-xl bg-primary/10 border-primary text-primary ring-1 ring-primary font-bold transition text-lg shadow-inner";
         }
 
-        // RAZORPAY INTEGRATION LOGIC
+        // PayU Integration Logic
         document.getElementById('donationForm').addEventListener('submit', function(e) {
-            e.preventDefault(); // Prevent standard HTML form submission
+            e.preventDefault(); // Stop standard submission
 
-            // 1. Get Data from Form
-            const name = document.getElementById('donorName').value;
-            const email = document.getElementById('donorEmail').value;
-            const phone = document.getElementById('donorPhone').value;
-            const amountInput = document.getElementById('customAmount').value;
+            // 1. Configuration (TEST CREDENTIALS)
+            // WARNING: In production, SALT must be kept server-side.
+            const payuConfig = {
+                key: "gtKFFx",
+                salt: "eCwWELxi", 
+                target: "https://test.payu.in/_payment" 
+            };
 
-            // Simple validation
-            if(!name || !email || !phone || !amountInput) {
-                alert("Please fill in all details to donate.");
+            // 2. Collect Data
+            const formData = {
+                txnid: "Txn" + new Date().getTime(), // Unique ID
+                amount: document.getElementById('customAmount').value,
+                productinfo: "Donation",
+                firstname: document.getElementById('donorName').value,
+                email: document.getElementById('donorEmail').value,
+                phone: document.getElementById('donorPhone').value,
+                surl: "https://www.google.com", // Redirect here on success (Demo: Google)
+                furl: "https://www.bing.com"    // Redirect here on failure (Demo: Bing)
+            };
+
+            // Basic Validation
+            if(!formData.firstname || !formData.email || !formData.phone || !formData.amount) {
+                alert("Please fill in all details.");
                 return;
             }
 
-            // Razorpay takes amount in PAISA (1 Rupee = 100 Paisa)
-            const amountInPaisa = amountInput * 100;
+            // 3. UI Feedback
+            const btn = document.getElementById('payBtn');
+            const btnText = document.getElementById('btnText');
+            const btnIcon = document.getElementById('btnIcon');
+            btn.disabled = true;
+            btnText.innerText = "Processing...";
+            btnIcon.className = "fas fa-circle-notch fa-spin text-white";
 
-            // 2. Razorpay Options
-            var options = {
-                "key": "YOUR_RAZORPAY_TEST_KEY_ID", // REPLACE THIS WITH YOUR TEST API KEY
-                "amount": amountInPaisa, 
-                "currency": "INR",
-                "name": "KindFund",
-                "description": "Donation for Rural India",
-                "image": "https://i.ibb.co/svMHRcFF/Green-Modern-Badge-Gardening-Logo-Design-20260202-115512-0000.png",
-                "handler": function (response){
-                    // This function runs on Successful Payment
-                    console.log("Payment ID: ", response.razorpay_payment_id);
-                    alert("Thank you " + name + "! Payment Successful. ID: " + response.razorpay_payment_id);
-                    
-                    // Here you would typically send response.razorpay_payment_id to your backend to verify
-                },
-                "prefill": {
-                    "name": name,
-                    "email": email,
-                    "contact": phone
-                },
-                "theme": {
-                    "color": "#059669" // Matches your Emerald Primary color
-                }
+            // 4. Calculate Hash (Client-side for DEMO ONLY)
+            // Hash Sequence: key|txnid|amount|productinfo|firstname|email|udf1|udf2|udf3|udf4|udf5||||||salt
+            const hashString = `${payuConfig.key}|${formData.txnid}|${formData.amount}|${formData.productinfo}|${formData.firstname}|${formData.email}|||||||||||${payuConfig.salt}`;
+            const hash = CryptoJS.SHA512(hashString).toString();
+
+            // 5. Create Hidden Form & Submit
+            const form = document.createElement('form');
+            form.action = payuConfig.target;
+            form.method = 'POST';
+
+            // Function to append inputs
+            const appendInput = (name, value) => {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = name;
+                input.value = value;
+                form.appendChild(input);
             };
 
-            // 3. Open Razorpay
-            var rzp1 = new Razorpay(options);
-            
-            // Handle Payment Failure
-            rzp1.on('payment.failed', function (response){
-                alert("Payment Failed: " + response.error.description);
-            });
+            appendInput('key', payuConfig.key);
+            appendInput('txnid', formData.txnid);
+            appendInput('amount', formData.amount);
+            appendInput('productinfo', formData.productinfo);
+            appendInput('firstname', formData.firstname);
+            appendInput('email', formData.email);
+            appendInput('phone', formData.phone);
+            appendInput('surl', formData.surl);
+            appendInput('furl', formData.furl);
+            appendInput('hash', hash);
 
-            rzp1.open();
+            document.body.appendChild(form);
+            form.submit();
         });
     </script>
 </body>
