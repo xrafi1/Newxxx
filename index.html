@@ -11,9 +11,9 @@
             theme: {
                 extend: {
                     colors: {
-                        primary: '#059669',
-                        primaryDark: '#047857',
-                        dark: '#0f172a',
+                        primary: '#059669', // Emerald 600
+                        primaryDark: '#047857', // Emerald 700
+                        dark: '#0f172a',    // Slate 900
                     },
                     fontFamily: {
                         sans: ['DM Sans', 'sans-serif'],
@@ -41,14 +41,32 @@
     </script>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
 
     <style>
         body { font-family: 'DM Sans', sans-serif; }
-        .glass-card { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.5); }
-        .glass-nav { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(0, 0, 0, 0.05); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
+        
+        /* Glass effect class */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Hide scrollbar for clean look */
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: #f1f5f9; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 antialiased overflow-x-hidden relative min-h-screen">
@@ -56,6 +74,7 @@
     <div class="fixed inset-0 z-0 overflow-hidden pointer-events-none">
         <div class="absolute top-0 left-1/4 w-96 h-96 bg-green-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
         <div class="absolute top-0 right-1/4 w-96 h-96 bg-teal-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
+        <div class="absolute -bottom-32 left-1/3 w-96 h-96 bg-yellow-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-4000"></div>
     </div>
 
     <nav id="navbar" class="fixed top-0 w-full z-50 transition-all duration-300 py-4 px-4 md:px-6">
@@ -64,17 +83,23 @@
                 <img src="https://i.ibb.co/svMHRcFF/Green-Modern-Badge-Gardening-Logo-Design-20260202-115512-0000.png" alt="KindFund Logo" class="h-10 w-10 rounded-full shadow-sm bg-white p-0.5">
                 <span class="font-bold text-lg tracking-tight text-slate-900">Kind<span class="text-primary">Fund</span></span>
             </a>
+            
             <div class="hidden md:flex gap-8 text-sm font-medium text-slate-600">
                 <a href="#active-campaigns" class="hover:text-primary transition">Campaigns</a>
                 <a href="#about" class="hover:text-primary transition">About Us</a>
                 <a href="#programs" class="hover:text-primary transition">Programs</a>
                 <a href="#impact" class="hover:text-primary transition">Impact</a>
+                <a href="#faq" class="hover:text-primary transition">FAQ</a>
             </div>
-            <a href="#donate" class="bg-slate-900 text-white px-6 py-2.5 rounded-full text-sm font-bold hover:bg-primary transition shadow-lg shadow-slate-900/20">Donate Now</a>
+
+            <a href="#donate" class="bg-slate-900 text-white px-6 py-2.5 rounded-full text-sm font-bold hover:bg-primary transition shadow-lg shadow-slate-900/20">
+                Donate Now
+            </a>
         </div>
     </nav>
 
     <div class="relative z-10 flex flex-col items-center justify-center pt-32 pb-20 px-4" id="donate">
+        
         <div class="text-center max-w-4xl mx-auto mb-10 animate-float">
             <div class="inline-flex items-center gap-2 bg-white/80 border border-green-100 backdrop-blur-sm rounded-full px-4 py-1.5 mb-6 shadow-sm">
                 <span class="flex h-2 w-2 relative">
@@ -84,14 +109,20 @@
                 <span class="text-xs font-bold text-emerald-700 uppercase tracking-wide">Verified Non-Profit • 100% Transparent</span>
             </div>
             <h1 class="text-5xl md:text-7xl font-extrabold tracking-tight text-slate-900 mb-6 leading-tight">
-                Give hope.<br><span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-teal-500">Save a future.</span>
+                Give hope.<br>
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-teal-500">Save a future.</span>
             </h1>
-            <p class="text-lg md:text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed">We bridge the gap between generosity and need. Your contribution directly supports education and nutrition.</p>
+            <p class="text-lg md:text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed">
+                We bridge the gap between generosity and need. Your contribution directly supports education, nutrition, and emergency relief in rural India.
+            </p>
         </div>
 
         <div class="w-full max-w-md">
             <div class="glass-card rounded-3xl p-2 shadow-2xl ring-1 ring-black/5 relative">
-                <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-primary to-teal-600 text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-lg z-20"><i class="fas fa-shield-alt mr-1"></i> 100% Secure Donation</div>
+                <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-primary to-teal-600 text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-lg z-20">
+                    <i class="fas fa-shield-alt mr-1"></i> 100% Secure Donation
+                </div>
+
                 <div class="bg-white/90 rounded-[1.3rem] p-6 md:p-8">
                     <form id="donationForm">
                         <div class="mb-6">
@@ -106,16 +137,27 @@
                                 <input type="number" id="customAmount" value="1000" class="w-full text-center pl-4 border-b-2 border-slate-200 py-3 bg-transparent font-bold text-2xl text-slate-900 focus:outline-none focus:border-primary transition" placeholder="Custom">
                             </div>
                         </div>
+
                         <div class="space-y-3 mb-6">
-                            <input type="text" id="donorName" placeholder="Full Name" class="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm font-medium focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition" required>
+                            <input type="text" id="donorName" placeholder="Full Name" class="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm font-medium focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition placeholder-slate-400" required>
                             <div class="flex gap-3">
-                                <input type="email" id="donorEmail" placeholder="Email" class="w-1/2 bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm font-medium focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition" required>
-                                <input type="tel" id="donorPhone" placeholder="Mobile" class="w-1/2 bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm font-medium focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition" required>
+                                <input type="email" id="donorEmail" placeholder="Email Address" class="w-1/2 bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm font-medium focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition placeholder-slate-400" required>
+                                <input type="tel" id="donorPhone" placeholder="Mobile" class="w-1/2 bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-sm font-medium focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition placeholder-slate-400" required>
                             </div>
                         </div>
-                        <button type="submit" class="w-full bg-slate-900 text-white py-4 rounded-xl font-bold text-lg shadow-xl hover:bg-black transition flex justify-center items-center gap-2 group">
-                            <span>Donate Now</span><i class="fas fa-heart text-red-500 animate-pulse-slow"></i>
+
+                        <button type="submit" class="w-full bg-slate-900 text-white py-4 rounded-xl font-bold text-lg shadow-xl shadow-slate-900/20 hover:bg-black hover:shadow-2xl transition transform hover:-translate-y-1 flex justify-center items-center gap-2 group relative overflow-hidden">
+                            <span class="relative z-10">Donate Now</span>
+                            <i class="fas fa-heart text-red-500 animate-pulse-slow group-hover:scale-125 transition relative z-10"></i>
+                            <div class="absolute inset-0 bg-gradient-to-r from-slate-800 to-black opacity-0 group-hover:opacity-100 transition duration-300"></div>
                         </button>
+                        
+                        <div class="mt-4 text-center flex flex-col items-center gap-1">
+                            <p class="text-[10px] text-slate-400 font-semibold uppercase tracking-wide">
+                                <i class="fas fa-lock text-green-600 mr-1"></i> 256-bit Encrypted Payment
+                            </p>
+                            <p class="text-[10px] text-slate-400">You will receive an instant donation receipt.</p>
+                        </div>
                     </form>
                 </div>
             </div>
@@ -130,7 +172,10 @@
                 <p class="text-slate-600">Support a specific cause that resonates with you. These campaigns are live and need your help now.</p>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8" id="campaigns-container">
-                <div class="col-span-full text-center py-10 text-slate-400">Loading active campaigns...</div>
+                <div class="col-span-full text-center py-10 text-slate-400 flex flex-col items-center">
+                    <i class="fas fa-circle-notch fa-spin text-3xl mb-3 text-primary"></i>
+                    <span>Loading active campaigns...</span>
+                </div>
             </div>
         </div>
     </section>
@@ -139,16 +184,42 @@
         <div class="max-w-7xl mx-auto px-4 md:px-6">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
                 <div class="relative">
-                    <img src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?q=80&w=1000&auto=format&fit=crop" class="rounded-3xl shadow-2xl relative z-10 w-full object-cover h-[500px]">
+                    <div class="absolute -left-4 -top-4 w-24 h-24 bg-green-100 rounded-full z-0"></div>
+                    <img src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?q=80&w=1000&auto=format&fit=crop" alt="Volunteers helping children" class="rounded-3xl shadow-2xl relative z-10 w-full object-cover h-[500px]">
+                    <div class="absolute -bottom-6 -right-6 bg-white p-6 rounded-2xl shadow-xl z-20 max-w-xs border border-slate-50">
+                        <p class="text-4xl font-bold text-primary mb-1">10+</p>
+                        <p class="text-sm font-bold text-slate-800">Years of Service</p>
+                        <p class="text-xs text-slate-500 mt-2">Serving the most remote villages of Assam and North East India since 2016.</p>
+                    </div>
                 </div>
                 <div>
                     <span class="text-primary font-bold text-sm uppercase tracking-widest mb-2 block">Who We Are</span>
-                    <h2 class="text-4xl md:text-5xl font-bold text-slate-900 mb-6">Driven by Empathy.</h2>
-                    <p class="text-slate-600 text-lg mb-6">KindFund began with a simple mission: to ensure no child sleeps hungry. We are not just a charity; we are a community of changemakers.</p>
+                    <h2 class="text-4xl md:text-5xl font-bold text-slate-900 mb-6">Driven by Empathy, <br>Fueled by Action.</h2>
+                    <p class="text-slate-600 text-lg mb-6 leading-relaxed">
+                        KindFund began with a simple mission: to ensure no child sleeps hungry. What started as a small community kitchen in Barpeta Road has grown into a movement touching thousands of lives.
+                    </p>
+                    <p class="text-slate-600 text-lg mb-8 leading-relaxed">
+                        We are not just a charity; we are a community of changemakers. We believe in <strong class="text-slate-900">radical transparency</strong>—every rupee you donate is accounted for and directed towards tangible change.
+                    </p>
+                    
                     <div class="grid grid-cols-2 gap-6">
                         <div class="flex items-start gap-3">
-                            <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-primary shrink-0"><i class="fas fa-check"></i></div>
-                            <div><h4 class="font-bold text-slate-900">Zero Admin Fees</h4><p class="text-xs text-slate-500">100% goes to the cause.</p></div>
+                            <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-primary shrink-0">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-slate-900">Zero Admin Fees</h4>
+                                <p class="text-xs text-slate-500 mt-1">100% goes to the cause.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 shrink-0">
+                                <i class="fas fa-file-invoice"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-slate-900">Monthly Reports</h4>
+                                <p class="text-xs text-slate-500 mt-1">We share proof of work.</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -161,27 +232,49 @@
             <div class="text-center max-w-2xl mx-auto mb-16">
                 <span class="text-primary font-bold text-sm uppercase tracking-widest">Our Impact</span>
                 <h2 class="text-4xl font-bold text-slate-900 mt-2 mb-4">Where Your Money Goes</h2>
+                <p class="text-slate-600">We focus on three core pillars to build sustainable communities.</p>
             </div>
+
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="bg-slate-50 rounded-3xl overflow-hidden shadow-sm border border-slate-100 hover:-translate-y-2 transition duration-300">
+                <div class="bg-white rounded-3xl overflow-hidden shadow-sm border border-slate-100 hover:shadow-xl hover:-translate-y-2 transition duration-300 group">
+                    <div class="h-48 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&q=80&w=800" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
+                    </div>
                     <div class="p-8">
-                        <div class="w-12 h-12 bg-orange-100 rounded-2xl flex items-center justify-center text-orange-500 mb-6 text-xl"><i class="fas fa-utensils"></i></div>
-                        <h3 class="text-2xl font-bold text-slate-900 mb-3">Nutrition</h3>
-                        <p class="text-slate-500">Providing daily nutritious meals to underprivileged children.</p>
+                        <div class="w-12 h-12 bg-orange-100 rounded-2xl flex items-center justify-center text-orange-500 mb-6 text-xl">
+                            <i class="fas fa-utensils"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-slate-900 mb-3">Nutrition for All</h3>
+                        <p class="text-slate-500 mb-6 leading-relaxed">Providing daily nutritious meals to underprivileged children and monthly grocery kits to widows and the elderly.</p>
+                        <a href="#" class="text-slate-900 font-bold text-sm hover:text-primary transition flex items-center gap-2">Learn More <i class="fas fa-arrow-right text-xs"></i></a>
                     </div>
                 </div>
-                <div class="bg-slate-50 rounded-3xl overflow-hidden shadow-sm border border-slate-100 hover:-translate-y-2 transition duration-300">
+
+                <div class="bg-white rounded-3xl overflow-hidden shadow-sm border border-slate-100 hover:shadow-xl hover:-translate-y-2 transition duration-300 group">
+                    <div class="h-48 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&q=80&w=800" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
+                    </div>
                     <div class="p-8">
-                        <div class="w-12 h-12 bg-blue-100 rounded-2xl flex items-center justify-center text-blue-500 mb-6 text-xl"><i class="fas fa-graduation-cap"></i></div>
-                        <h3 class="text-2xl font-bold text-slate-900 mb-3">Education</h3>
-                        <p class="text-slate-500">Sponsoring school fees and books for children at risk.</p>
+                        <div class="w-12 h-12 bg-blue-100 rounded-2xl flex items-center justify-center text-blue-500 mb-6 text-xl">
+                            <i class="fas fa-graduation-cap"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-slate-900 mb-3">Education First</h3>
+                        <p class="text-slate-500 mb-6 leading-relaxed">Sponsoring school fees, uniforms, and books for children who are at risk of dropping out due to poverty.</p>
+                        <a href="#" class="text-slate-900 font-bold text-sm hover:text-primary transition flex items-center gap-2">Learn More <i class="fas fa-arrow-right text-xs"></i></a>
                     </div>
                 </div>
-                <div class="bg-slate-50 rounded-3xl overflow-hidden shadow-sm border border-slate-100 hover:-translate-y-2 transition duration-300">
+
+                <div class="bg-white rounded-3xl overflow-hidden shadow-sm border border-slate-100 hover:shadow-xl hover:-translate-y-2 transition duration-300 group">
+                    <div class="h-48 overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?auto=format&fit=crop&q=80&w=800" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
+                    </div>
                     <div class="p-8">
-                        <div class="w-12 h-12 bg-red-100 rounded-2xl flex items-center justify-center text-red-500 mb-6 text-xl"><i class="fas fa-heartbeat"></i></div>
-                        <h3 class="text-2xl font-bold text-slate-900 mb-3">Medical</h3>
-                        <p class="text-slate-500">Emergency medical funds for critical surgeries.</p>
+                        <div class="w-12 h-12 bg-red-100 rounded-2xl flex items-center justify-center text-red-500 mb-6 text-xl">
+                            <i class="fas fa-heartbeat"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-slate-900 mb-3">Medical Relief</h3>
+                        <p class="text-slate-500 mb-6 leading-relaxed">Emergency medical funds for families who cannot afford critical surgeries or medicines.</p>
+                        <a href="#" class="text-slate-900 font-bold text-sm hover:text-primary transition flex items-center gap-2">Learn More <i class="fas fa-arrow-right text-xs"></i></a>
                     </div>
                 </div>
             </div>
@@ -189,41 +282,143 @@
     </section>
 
     <section class="py-16 bg-slate-900 text-white relative overflow-hidden" id="impact">
+        <div class="absolute top-0 right-0 w-64 h-64 bg-primary rounded-full mix-blend-overlay filter blur-3xl opacity-20"></div>
+        <div class="absolute bottom-0 left-0 w-64 h-64 bg-blue-500 rounded-full mix-blend-overlay filter blur-3xl opacity-20"></div>
+        
         <div class="max-w-7xl mx-auto px-4 relative z-10">
             <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-                <div class="p-4"><div class="text-4xl font-bold text-green-400 mb-2">5k+</div><div class="text-slate-400 text-sm uppercase">Lives Impacted</div></div>
-                <div class="p-4"><div class="text-4xl font-bold text-green-400 mb-2">12+</div><div class="text-slate-400 text-sm uppercase">Villages</div></div>
-                <div class="p-4"><div class="text-4xl font-bold text-green-400 mb-2">800+</div><div class="text-slate-400 text-sm uppercase">Donors</div></div>
-                <div class="p-4"><div class="text-4xl font-bold text-green-400 mb-2">100%</div><div class="text-slate-400 text-sm uppercase">Transparency</div></div>
+                <div class="p-4">
+                    <div class="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-200 mb-2">5k+</div>
+                    <div class="text-slate-400 text-sm font-medium uppercase tracking-wider">Lives Impacted</div>
+                </div>
+                <div class="p-4">
+                    <div class="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-200 mb-2">12+</div>
+                    <div class="text-slate-400 text-sm font-medium uppercase tracking-wider">Villages Covered</div>
+                </div>
+                <div class="p-4">
+                    <div class="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-200 mb-2">800+</div>
+                    <div class="text-slate-400 text-sm font-medium uppercase tracking-wider">Active Donors</div>
+                </div>
+                <div class="p-4">
+                    <div class="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-emerald-200 mb-2">100%</div>
+                    <div class="text-slate-400 text-sm font-medium uppercase tracking-wider">Transparency</div>
+                </div>
             </div>
         </div>
     </section>
 
-    <footer class="bg-white border-t border-slate-100 pt-16 pb-8">
+    <section class="py-24 bg-white">
+        <div class="max-w-5xl mx-auto px-4">
+            <div class="bg-green-50 rounded-[2.5rem] p-8 md:p-12 relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-green-300 via-primary to-green-300"></div>
+                <i class="fas fa-quote-right text-green-200 text-9xl absolute top-8 right-8 opacity-50"></i>
+                
+                <div class="relative z-10 flex flex-col md:flex-row items-center gap-10">
+                    <div class="w-32 h-32 md:w-48 md:h-48 shrink-0">
+                        <img src="https://images.unsplash.com/photo-1489424731084-a5d8b219a5bb?auto=format&fit=crop&q=80&w=400" alt="Beneficiary" class="w-full h-full object-cover rounded-full border-4 border-white shadow-lg">
+                    </div>
+                    <div>
+                        <p class="text-xl md:text-2xl text-slate-700 font-medium italic mb-6">
+                            "When my husband passed away, I didn't know how I would feed my two daughters. KindFund didn't just give us food; they helped me start a small sewing business. Today, my daughters are in school, and I am independent."
+                        </p>
+                        <div>
+                            <h4 class="font-bold text-slate-900 text-lg">Sunita Devi</h4>
+                            <p class="text-emerald-600 font-medium text-sm">Small Business Owner, Barpeta</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="faq" class="py-20 bg-slate-50">
+        <div class="max-w-3xl mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-slate-900">Frequently Asked Questions</h2>
+            </div>
+            
+            <div class="space-y-4">
+                <details class="group bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                    <summary class="flex justify-between items-center font-bold cursor-pointer list-none p-6 text-slate-800">
+                        <span>Will I receive a donation receipt?</span>
+                        <span class="transition group-open:rotate-180">
+                            <i class="fas fa-chevron-down text-primary"></i>
+                        </span>
+                    </summary>
+                    <div class="text-slate-600 px-6 pb-6 pt-0 leading-relaxed">
+                        Yes, you will receive an instant digital receipt via email for every donation made. We maintain complete transparency with our donors.
+                    </div>
+                </details>
+
+                <details class="group bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                    <summary class="flex justify-between items-center font-bold cursor-pointer list-none p-6 text-slate-800">
+                        <span>Can I donate via UPI?</span>
+                        <span class="transition group-open:rotate-180">
+                            <i class="fas fa-chevron-down text-primary"></i>
+                        </span>
+                    </summary>
+                    <div class="text-slate-600 px-6 pb-6 pt-0 leading-relaxed">
+                        Absolutely. We support all major UPI apps (GooglePay, PhonePe, Paytm, BHIM) as well as Net Banking, Debit Cards, and Credit Cards through our secure payment gateway.
+                    </div>
+                </details>
+
+                <details class="group bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+                    <summary class="flex justify-between items-center font-bold cursor-pointer list-none p-6 text-slate-800">
+                        <span>How do I know my money is being used correctly?</span>
+                        <span class="transition group-open:rotate-180">
+                            <i class="fas fa-chevron-down text-primary"></i>
+                        </span>
+                    </summary>
+                    <div class="text-slate-600 px-6 pb-6 pt-0 leading-relaxed">
+                        We publish monthly financial reports on our website. Furthermore, you can subscribe to our newsletter to receive photo and video updates of the specific project you supported.
+                    </div>
+                </details>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-white border-t border-slate-100 pt-16 pb-8 relative z-10">
         <div class="max-w-7xl mx-auto px-4">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
                 <div class="md:col-span-2">
                     <a href="#" class="flex items-center gap-2 mb-4">
-                        <img src="https://i.ibb.co/svMHRcFF/Green-Modern-Badge-Gardening-Logo-Design-20260202-115512-0000.png" alt="Logo" class="h-10 w-10 rounded-full">
+                        <img src="https://i.ibb.co/svMHRcFF/Green-Modern-Badge-Gardening-Logo-Design-20260202-115512-0000.png" alt="KindFund Logo" class="h-10 w-10 rounded-full">
                         <span class="font-bold text-xl tracking-tight text-slate-900">KindFund</span>
                     </a>
-                    <p class="text-slate-500 mb-6 max-w-sm">Making philanthropy simple, transparent, and impactful.</p>
+                    <p class="text-slate-500 mb-6 max-w-sm">Making philanthropy simple, transparent, and impactful. Join us in building a better world.</p>
+                    <div class="flex gap-4">
+                        <a href="#" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-primary hover:text-white transition"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-primary hover:text-white transition"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-primary hover:text-white transition"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
                 </div>
+                
                 <div>
                     <h4 class="font-bold text-slate-900 mb-4">Quick Links</h4>
                     <ul class="space-y-3 text-sm text-slate-500 font-medium">
-                        <li><a href="#about" class="hover:text-primary">About Us</a></li>
-                        <li><a href="join.html" class="hover:text-primary">Join Us</a></li>
-                        <li><a href="contact.html" class="hover:text-primary">Contact Us</a></li>
+                        <li><a href="#about" class="hover:text-primary transition">About Us</a></li>
+                        <li><a href="#programs" class="hover:text-primary transition">Our Programs</a></li>
+                        <li><a href="join.html" class="hover:text-primary transition">Join Us</a></li>
+                        <li><a href="contact.html" class="hover:text-primary transition">Contact Us</a></li>
                     </ul>
                 </div>
+
+                <div>
+                    <h4 class="font-bold text-slate-900 mb-4">Newsletter</h4>
+                    <p class="text-xs text-slate-500 mb-4">Stay updated with our latest drives.</p>
+                    <form class="flex gap-2">
+                        <input type="email" placeholder="Email" class="bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm w-full focus:outline-none focus:border-primary">
+                        <button class="bg-slate-900 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-primary transition">Go</button>
+                    </form>
+                </div>
             </div>
-            <div class="border-t border-slate-100 pt-8 text-center md:flex md:justify-between">
-                <p class="text-slate-400 text-sm">&copy; 2026 KindFund Foundation.</p>
+
+            <div class="border-t border-slate-100 pt-8 text-center md:flex md:justify-between md:text-left">
+                <p class="text-slate-400 text-sm mb-4 md:mb-0">&copy; 2026 KindFund Foundation. Barpeta Road, Assam.</p>
                 <div class="flex justify-center md:justify-end gap-6 text-sm font-medium text-slate-400">
-                    <a href="privacy.html">Privacy Policy</a>
-                    <a href="terms.html">Terms</a>
-                    <a href="refunds.html">Refunds</a>
+                    <a href="privacy.html" class="hover:text-slate-900">Privacy Policy</a>
+                    <a href="terms.html" class="hover:text-slate-900">Terms of Service</a>
+                    <a href="refunds.html" class="hover:text-slate-900">Refund Policy</a>
                 </div>
             </div>
         </div>
@@ -231,9 +426,10 @@
 
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-analytics-compat.js"></script>
 
     <script>
-        // 1. Firebase Config
+        // 1. Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyA8pDzeJM8vlBpONEVmDuCGe0kgX9DQ-h8",
             authDomain: "kindfund.firebaseapp.com",
@@ -243,54 +439,12 @@
             appId: "1:195133397316:web:eecf547352464272f11f11",
             measurementId: "G-Q2QS702LRV"
         };
-        firebase.initializeApp(firebaseConfig);
+
+        // 2. Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // 2. Load Campaigns dynamically from Firebase
-        db.collection('campaigns').where('status', '==', 'active').onSnapshot((snapshot) => {
-            const container = document.getElementById('campaigns-container');
-            let html = '';
-            
-            if (snapshot.empty) {
-                container.innerHTML = '<div class="col-span-full text-center py-10 text-slate-500">No active campaigns at the moment. Please check back later.</div>';
-                return;
-            }
-
-            snapshot.forEach(doc => {
-                const data = doc.data();
-                const percent = Math.min(100, Math.round((data.raised / data.goal) * 100));
-                
-                html += `
-                <div class="bg-white rounded-3xl overflow-hidden shadow-lg border border-slate-100 hover:-translate-y-2 transition duration-300 flex flex-col h-full">
-                    <div class="h-56 overflow-hidden relative">
-                        <img src="${data.image}" class="w-full h-full object-cover">
-                        <div class="absolute top-4 right-4 bg-white/90 px-3 py-1 rounded-full text-xs font-bold text-primary shadow-sm">
-                            <i class="fas fa-check-circle"></i> Verified
-                        </div>
-                    </div>
-                    <div class="p-6 flex flex-col flex-grow">
-                        <h3 class="text-xl font-bold text-slate-900 mb-2">${data.title}</h3>
-                        <p class="text-slate-500 text-sm mb-4 line-clamp-2">${data.description}</p>
-                        
-                        <div class="mt-auto">
-                            <div class="w-full bg-slate-100 rounded-full h-2.5 mb-2">
-                                <div class="bg-primary h-2.5 rounded-full" style="width: ${percent}%"></div>
-                            </div>
-                            <div class="flex justify-between text-xs font-bold text-slate-700 mb-4">
-                                <span>₹${Number(data.raised).toLocaleString('en-IN')} Raised</span>
-                                <span>Goal: ₹${Number(data.goal).toLocaleString('en-IN')}</span>
-                            </div>
-                            <a href="#donate" onclick="presetDonation('${data.title}')" class="block w-full text-center border-2 border-primary text-primary hover:bg-primary hover:text-white py-2 rounded-xl font-bold transition">
-                                Donate to this Cause
-                            </a>
-                        </div>
-                    </div>
-                </div>`;
-            });
-            container.innerHTML = html;
-        });
-
-        // 3. UI Helpers
+        // 3. UI Interactions
         function pick(amount, btn) {
             document.getElementById('customAmount').value = amount;
             document.querySelectorAll('.amt-btn').forEach(b => {
@@ -300,11 +454,11 @@
         }
 
         function presetDonation(cause) {
-            // Optional: You could store the cause in a hidden input to track which campaign received the donation
+            document.getElementById('customAmount').focus();
             alert("Please complete the donation form above for: " + cause);
         }
 
-        // Navbar Scroll
+        // Navbar Scroll Effect
         window.addEventListener('scroll', function() {
             const navContainer = document.getElementById('nav-container');
             if (window.scrollY > 20) {
@@ -316,7 +470,54 @@
             }
         });
 
-        // 4. Handle Donation Submission -> Send to Firebase
+        // 4. LOAD CAMPAIGNS (Real-time from Firebase)
+        db.collection('campaigns').where('status', '==', 'active').onSnapshot((snapshot) => {
+            const container = document.getElementById('campaigns-container');
+            let html = '';
+            
+            if (snapshot.empty) {
+                container.innerHTML = '<div class="col-span-full text-center py-10 text-slate-500">No active campaigns at the moment. Please check back later.</div>';
+                return;
+            }
+
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                // Safe calculation for progress bar
+                let raised = Number(data.raised) || 0;
+                let goal = Number(data.goal) || 1; 
+                let percent = Math.min(100, Math.round((raised / goal) * 100));
+                
+                html += `
+                <div class="bg-white rounded-3xl overflow-hidden shadow-lg border border-slate-100 hover:-translate-y-2 transition duration-300 flex flex-col h-full group">
+                    <div class="h-56 overflow-hidden relative">
+                        <img src="${data.image}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                        <div class="absolute top-4 right-4 bg-white/90 px-3 py-1 rounded-full text-xs font-bold text-primary shadow-sm backdrop-blur-sm">
+                            <i class="fas fa-check-circle"></i> Verified
+                        </div>
+                    </div>
+                    <div class="p-6 flex flex-col flex-grow">
+                        <h3 class="text-xl font-bold text-slate-900 mb-2">${data.title}</h3>
+                        <p class="text-slate-500 text-sm mb-4 line-clamp-2">${data.description}</p>
+                        
+                        <div class="mt-auto">
+                            <div class="flex justify-between text-xs font-bold text-slate-700 mb-1">
+                                <span>₹${raised.toLocaleString('en-IN')} Raised</span>
+                                <span>${percent}%</span>
+                            </div>
+                            <div class="w-full bg-slate-100 rounded-full h-2.5 mb-4 overflow-hidden">
+                                <div class="bg-primary h-2.5 rounded-full transition-all duration-1000" style="width: ${percent}%"></div>
+                            </div>
+                            <a href="#donate" onclick="presetDonation('${data.title}')" class="block w-full text-center border-2 border-primary text-primary hover:bg-primary hover:text-white py-2 rounded-xl font-bold transition">
+                                Donate to this Cause
+                            </a>
+                        </div>
+                    </div>
+                </div>`;
+            });
+            container.innerHTML = html;
+        });
+
+        // 5. HANDLE DONATION SUBMISSION (Save to Firebase)
         document.getElementById('donationForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const amount = document.getElementById('customAmount').value;
@@ -324,13 +525,15 @@
             const email = document.getElementById('donorEmail').value;
             const phone = document.getElementById('donorPhone').value;
 
-            // Simulate Payment Gateway Success
+            // UI Feedback
             const btn = e.target.querySelector('button');
-            const originalText = btn.innerHTML;
+            const originalContent = btn.innerHTML;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
             btn.disabled = true;
 
-            // In a real app, this happens inside the Payment Gateway callback
+            // In a real app, integrate Payment Gateway (Cashfree/Razorpay) here.
+            // For now, we simulate success and save to Firebase Database.
+            
             setTimeout(() => {
                 db.collection('donations').add({
                     donorName: name,
@@ -338,17 +541,17 @@
                     phone: phone,
                     amount: Number(amount),
                     timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                    status: 'verified',
+                    status: 'verified', // Assuming successful payment
                     method: 'Online'
                 }).then(() => {
                     alert(`Thank you ${name}! Your donation of ₹${amount} was successful.`);
                     e.target.reset();
-                    btn.innerHTML = originalText;
+                    btn.innerHTML = originalContent;
                     btn.disabled = false;
                 }).catch(err => {
-                    console.error(err);
+                    console.error("Error adding document: ", err);
                     alert('Error processing donation. Please try again.');
-                    btn.innerHTML = originalText;
+                    btn.innerHTML = originalContent;
                     btn.disabled = false;
                 });
             }, 1500);
