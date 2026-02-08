@@ -1,88 +1,32 @@
-const express = require('express');
-const http = require('http');
-const { Server } = require("socket.io");
-const path = require('path');
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neon Tic-Tac-Toe: T vs R</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">NEON BATTLE</h1>
+        <div class="status" id="status">Player T's Turn</div>
+        
+        <div class="game-board">
+            <div class="cell" data-index="0"></div>
+            <div class="cell" data-index="1"></div>
+            <div class="cell" data-index="2"></div>
+            <div class="cell" data-index="3"></div>
+            <div class="cell" data-index="4"></div>
+            <div class="cell" data-index="5"></div>
+            <div class="cell" data-index="6"></div>
+            <div class="cell" data-index="7"></div>
+            <div class="cell" data-index="8"></div>
+            <div class="strike" id="strike"></div>
+        </div>
 
-const app = express();
-const server = http.createServer(app);
-const io = new Server(server);
+        <button class="restart-btn" id="restartBtn">Reset Game</button>
+    </div>
 
-app.use(express.static(path.join(__dirname, 'public')));
-
-// Store room data
-const rooms = {};
-
-io.on('connection', (socket) => {
-    console.log('User connected:', socket.id);
-
-    // Create a Game
-    socket.on('createGame', (roomId) => {
-        if (rooms[roomId]) {
-            socket.emit('error', 'Room already exists!');
-            return;
-        }
-        rooms[roomId] = { players: [socket.id], board: Array(9).fill(null), turn: 'R' };
-        socket.join(roomId);
-        socket.emit('playerAssigned', { player: 'R', roomId });
-        console.log(`Game created: ${roomId}`);
-    });
-
-    // Join a Game
-    socket.on('joinGame', (roomId) => {
-        const room = rooms[roomId];
-        if (room && room.players.length < 2) {
-            room.players.push(socket.id);
-            socket.join(roomId);
-            socket.emit('playerAssigned', { player: 'T', roomId });
-            io.to(roomId).emit('gameStart', { turn: 'R' }); // Notify both to start
-            console.log(`Player joined: ${roomId}`);
-        } else {
-            socket.emit('error', 'Room is full or does not exist!');
-        }
-    });
-
-    // Handle Moves
-    socket.on('makeMove', ({ roomId, index, player }) => {
-        const room = rooms[roomId];
-        if (room && room.turn === player && !room.board[index]) {
-            room.board[index] = player;
-            room.turn = player === 'R' ? 'T' : 'R'; // Switch turn
-            
-            // Broadcast update to EVERYONE in the room
-            io.to(roomId).emit('updateBoard', { index, player, nextTurn: room.turn });
-            
-            checkWinner(room, roomId);
-        }
-    });
-
-    // Handle Disconnect
-    socket.on('disconnect', () => {
-        console.log('User disconnected');
-        // Optional: Add logic to delete empty rooms
-    });
-});
-
-function checkWinner(room, roomId) {
-    const winPatterns = [
-        [0, 1, 2], [3, 4, 5], [6, 7, 8], 
-        [0, 3, 6], [1, 4, 7], [2, 5, 8], 
-        [0, 4, 8], [2, 4, 6]
-    ];
-
-    for (let pattern of winPatterns) {
-        const [a, b, c] = pattern;
-        if (room.board[a] && room.board[a] === room.board[b] && room.board[a] === room.board[c]) {
-            io.to(roomId).emit('gameOver', { winner: room.board[a] });
-            return;
-        }
-    }
-
-    if (!room.board.includes(null)) {
-        io.to(roomId).emit('gameOver', { winner: 'Draw' });
-    }
-}
-
-server.listen(3000, () => {
-    console.log('Server running on http://localhost:3000');
-});
-            
+    <script src="script.js"></script>
+</body>
+</html>
