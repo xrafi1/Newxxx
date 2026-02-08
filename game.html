@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neon RT Game</title>
+    <style>
+        /* CSS: Styling the Game to look like the image */
+        body {
+            background-color: #0d0d18; /* Dark Navy Background */
+            color: white;
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        h1 {
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            text-shadow: 0 0 10px #fff;
+            margin-bottom: 20px;
+        }
+
+        .status {
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            height: 30px;
+        }
+
+        /* The Game Board Grid */
+        .game-board {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-template-rows: repeat(3, 100px);
+            gap: 5px;
+            position: relative;
+        }
+
+        /* Individual Cells */
+        .cell {
+            background-color: #161625;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            cursor: pointer;
+            border: 2px solid #00d2ff; /* Neon Blue Grid Lines */
+            box-shadow: 0 0 5px #00d2ff, inset 0 0 5px #00d2ff; /* Subtle glow */
+            transition: background-color 0.3s;
+        }
+
+        .cell:hover {
+            background-color: #1f1f33;
+        }
+
+        /* Styling for 'R' (Replaces O - Red Neon) */
+        .cell.r {
+            color: #ff0055;
+            text-shadow: 0 0 10px #ff0055, 0 0 20px #ff0055, 0 0 40px #ff0055;
+        }
+
+        /* Styling for 'T' (Replaces X - Blue Neon) */
+        .cell.t {
+            color: #00eaff;
+            text-shadow: 0 0 10px #00eaff, 0 0 20px #00eaff, 0 0 40px #00eaff;
+        }
+
+        /* Restart Button */
+        #restartBtn {
+            margin-top: 30px;
+            padding: 10px 20px;
+            font-size: 1.2rem;
+            background-color: transparent;
+            color: #fff;
+            border: 2px solid #fff;
+            cursor: pointer;
+            transition: 0.3s;
+            text-transform: uppercase;
+        }
+
+        #restartBtn:hover {
+            background-color: #fff;
+            color: #000;
+            box-shadow: 0 0 15px #fff;
+        }
+
+        /* Winning Line Overlay (Optional visual flair) */
+        .winning-message {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+        
+        .winning-message.show {
+            display: flex;
+        }
+
+        .winning-text {
+            font-size: 5rem;
+            text-shadow: 0 0 20px white;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Neon RT Game</h1>
+    <div class="status" id="status">Player R's Turn</div>
+
+    <div class="game-board" id="board">
+        <div class="cell" data-index="0"></div>
+        <div class="cell" data-index="1"></div>
+        <div class="cell" data-index="2"></div>
+        <div class="cell" data-index="3"></div>
+        <div class="cell" data-index="4"></div>
+        <div class="cell" data-index="5"></div>
+        <div class="cell" data-index="6"></div>
+        <div class="cell" data-index="7"></div>
+        <div class="cell" data-index="8"></div>
+    </div>
+
+    <button id="restartBtn">Restart Game</button>
+
+    <div class="winning-message" id="winningMessage">
+        <div class="winning-text" id="winnerText"></div>
+        <button id="newGameBtn" style="font-size: 1.5rem; padding: 10px 20px; margin-top:20px; cursor:pointer;">Play Again</button>
+    </div>
+
+    <script>
+        // JAVASCRIPT: Game Logic
+        const cells = document.querySelectorAll('.cell');
+        const statusText = document.getElementById('status');
+        const restartBtn = document.getElementById('restartBtn');
+        const winningMessageElement = document.getElementById('winningMessage');
+        const winnerTextElement = document.getElementById('winnerText');
+        const newGameBtn = document.getElementById('newGameBtn');
+
+        let currentPlayer = "R"; // Starting with 'R' (Red)
+        let gameActive = true;
+        let gameState = ["", "", "", "", "", "", "", "", ""];
+
+        const winningConditions = [
+            [0, 1, 2],
+            [3, 4, 5],
+            [6, 7, 8],
+            [0, 3, 6],
+            [1, 4, 7],
+            [2, 5, 8],
+            [0, 4, 8],
+            [2, 4, 6]
+        ];
+
+        // Handle cell click
+        function handleCellClick(clickedCellEvent) {
+            const clickedCell = clickedCellEvent.target;
+            const clickedCellIndex = parseInt(clickedCell.getAttribute('data-index'));
+
+            if (gameState[clickedCellIndex] !== "" || !gameActive) {
+                return;
+            }
+
+            handleCellPlayed(clickedCell, clickedCellIndex);
+            handleResultValidation();
+        }
+
+        // Update Game State and UI
+        function handleCellPlayed(clickedCell, clickedCellIndex) {
+            gameState[clickedCellIndex] = currentPlayer;
+            clickedCell.innerText = currentPlayer;
+            
+            // Apply color class based on player
+            if (currentPlayer === "R") {
+                clickedCell.classList.add('r');
+            } else {
+                clickedCell.classList.add('t');
+            }
+        }
+
+        // Check for Win or Draw
+        function handleResultValidation() {
+            let roundWon = false;
+            for (let i = 0; i <= 7; i++) {
+                const winCondition = winningConditions[i];
+                let a = gameState[winCondition[0]];
+                let b = gameState[winCondition[1]];
+                let c = gameState[winCondition[2]];
+                if (a === '' || b === '' || c === '') {
+                    continue;
+                }
+                if (a === b && b === c) {
+                    roundWon = true;
+                    break;
+                }
+            }
+
+            if (roundWon) {
+                statusText.innerText = `Player ${currentPlayer} Wins!`;
+                showWinningScreen(`Player ${currentPlayer} Wins!`);
+                gameActive = false;
+                return;
+            }
+
+            let roundDraw = !gameState.includes("");
+            if (roundDraw) {
+                statusText.innerText = "Draw!";
+                showWinningScreen("Draw!");
+                gameActive = false;
+                return;
+            }
+
+            handlePlayerChange();
+        }
+
+        function handlePlayerChange() {
+            currentPlayer = currentPlayer === "R" ? "T" : "R";
+            statusText.innerText = `Player ${currentPlayer}'s Turn`;
+            statusText.style.color = currentPlayer === "R" ? "#ff0055" : "#00eaff";
+        }
+
+        function showWinningScreen(message) {
+            winnerTextElement.innerText = message;
+            // Color the winning text
+            winnerTextElement.style.color = currentPlayer === "R" ? "#ff0055" : "#00eaff";
+            if(message === "Draw!") winnerTextElement.style.color = "white";
+            
+            winningMessageElement.classList.add('show');
+        }
+
+        function restartGame() {
+            gameActive = true;
+            currentPlayer = "R";
+            gameState = ["", "", "", "", "", "", "", "", ""];
+            statusText.innerText = "Player R's Turn";
+            statusText.style.color = "white";
+            winningMessageElement.classList.remove('show');
+            cells.forEach(cell => {
+                cell.innerText = "";
+                cell.classList.remove('r', 't');
+            });
+        }
+
+        cells.forEach(cell => cell.addEventListener('click', handleCellClick));
+        restartBtn.addEventListener('click', restartGame);
+        newGameBtn.addEventListener('click', restartGame);
+    </script>
+</body>
+</html>
+
