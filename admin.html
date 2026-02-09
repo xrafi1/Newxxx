@@ -5,11 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kindfund | Admin Dashboard</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: { colors: { primary: '#059669', dark: '#0f172a' }, fontFamily: { sans: ['DM Sans', 'sans-serif'] } }
+            }
+        }
+    </script>
+
     <style>
+        /* --- DASHBOARD CUSTOM STYLES --- */
+        /* Note: Tailwind Preflight might reset some defaults. These specific styles ensure the dashboard looks correct. */
         :root {
             --primary-green: #10b981;
             --dark-green: #064e3b;
@@ -23,12 +34,13 @@
             --radius: 12px;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        /* Scoping Dashboard Styles to avoid Tailwind conflicts */
+        #admin-panel * { font-family: 'Inter', sans-serif; }
         
-        body { background-color: var(--bg-color); color: var(--text-dark); height: 100vh; overflow: hidden; }
+        body { background-color: var(--bg-color); color: var(--text-dark); height: 100vh; overflow: hidden; margin: 0; padding: 0; }
 
         /* --- UTILITIES --- */
-        .btn { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; transition: 0.3s; }
+        .btn { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; transition: 0.3s; display: inline-block; }
         .btn-primary { background-color: var(--primary-green); color: white; }
         .btn-primary:hover { background-color: var(--dark-green); }
         .btn-danger { background-color: #ef4444; color: white; }
@@ -39,24 +51,8 @@
         .badge-success { background-color: var(--light-green); color: var(--dark-green); }
         .badge-pending { background-color: #fef3c7; color: #92400e; }
 
-        /* --- LOGIN PAGE --- */
-        #login-section {
-            display: flex; height: 100vh; justify-content: center; align-items: center;
-            background: linear-gradient(135deg, var(--dark-green), var(--primary-green));
-            position: absolute; width: 100%; z-index: 9999;
-        }
-        .login-card {
-            background: white; padding: 40px; border-radius: var(--radius); width: 100%; max-width: 400px;
-            text-align: center; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-        }
-        .login-logo { width: 80px; margin-bottom: 20px; }
-        .form-group { margin-bottom: 20px; text-align: left; }
-        .form-group label { display: block; margin-bottom: 8px; font-size: 14px; color: var(--text-gray); }
-        .form-input { width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px; outline: none; }
-        .form-input:focus { border-color: var(--primary-green); ring: 2px solid var(--light-green); }
-
         /* --- DASHBOARD LAYOUT --- */
-        #admin-panel { display: none; height: 100vh; display: flex; } 
+        #admin-panel { display: none; height: 100vh; display: flex; width: 100%; } 
         
         /* Sidebar */
         .sidebar {
@@ -116,6 +112,12 @@
         .progress-bar { height: 8px; background: #e5e7eb; border-radius: 4px; margin: 15px 0; overflow: hidden; }
         .progress-fill { height: 100%; background: var(--primary-green); width: 0%; transition: width 1s; }
 
+        /* Forms in Dashboard */
+        .form-input { width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 8px; outline: none; }
+        .form-input:focus { border-color: var(--primary-green); ring: 2px solid var(--light-green); }
+        .form-group { margin-bottom: 20px; text-align: left; }
+        .form-group label { display: block; margin-bottom: 8px; font-size: 14px; color: var(--text-gray); }
+
         /* Simple Modal */
         .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4); justify-content: center; align-items: center; }
         .modal-content { background-color: #fefefe; padding: 20px; border-radius: var(--radius); width: 90%; max-width: 500px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
@@ -140,26 +142,44 @@
         }
     </style>
 </head>
-<body>
+<body class="bg-slate-50 text-slate-800 antialiased">
 
-    <div id="login-section">
-        <div class="login-card">
-            <img src="https://i.ibb.co/svMHRcFF/Green-Modern-Badge-Gardening-Logo-Design-20260202-115512-0000.png" alt="Kindfund Logo" class="login-logo">
-            <h2 style="margin-bottom: 5px;">Kindfund Admin</h2>
-            <p style="color: var(--text-gray); margin-bottom: 30px;">Secure Access Portal</p>
-            
+    <div id="login-section" class="h-screen flex items-center justify-center relative overflow-hidden bg-slate-50 w-full fixed z-50">
+        
+        <div class="absolute -top-40 -right-40 w-96 h-96 bg-green-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse"></div>
+        <div class="absolute -bottom-40 -left-40 w-96 h-96 bg-teal-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse"></div>
+
+        <div class="w-full max-w-sm bg-white p-8 rounded-3xl shadow-xl border border-slate-100 relative z-10">
+            <div class="text-center mb-8">
+                <img src="https://i.ibb.co/svMHRcFF/Green-Modern-Badge-Gardening-Logo-Design-20260202-115512-0000.png" class="h-16 w-16 mx-auto rounded-full mb-4 shadow-sm">
+                <h1 class="text-2xl font-bold text-slate-900">Admin Portal</h1>
+                <p class="text-slate-500 text-sm">Sign in to manage KindFund</p>
+            </div>
+
             <form id="loginForm">
-                <div class="form-group">
-                    <label>Email Address</label>
-                    <input type="email" id="loginEmail" class="form-input" placeholder="admin@kindfund.org" required>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Email</label>
+                        <div class="relative">
+                            <i class="fas fa-envelope absolute left-4 top-3.5 text-slate-400"></i>
+                            <input type="email" id="email" class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition font-medium" placeholder="admin@kindfund.org" required>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Password</label>
+                        <div class="relative">
+                            <i class="fas fa-lock absolute left-4 top-3.5 text-slate-400"></i>
+                            <input type="password" id="password" class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition font-medium" placeholder="••••••••" required>
+                        </div>
+                    </div>
                 </div>
-                <div class="form-group">
-                    <label>Password</label>
-                    <input type="password" id="loginPass" class="form-input" placeholder="••••••••" required>
-                </div>
-                <button type="submit" class="btn btn-primary" style="width: 100%;">Secure Login</button>
+
+                <div id="errorMessage" class="hidden mt-4 text-xs text-red-600 bg-red-50 p-3 rounded-lg text-center font-bold"></div>
+
+                <button type="submit" id="loginBtn" class="w-full bg-slate-900 text-white mt-8 py-3.5 rounded-xl font-bold hover:bg-primary transition shadow-lg shadow-slate-900/20">
+                    Secure Login <i class="fas fa-arrow-right ml-2"></i>
+                </button>
             </form>
-            <p id="loginError" style="color: red; margin-top: 10px; font-size: 13px; display: none;"></p>
         </div>
     </div>
 
@@ -373,28 +393,49 @@
 
         // 2. Authentication Logic
         const loginForm = document.getElementById('loginForm');
+        const loginBtn = document.getElementById('loginBtn');
+        const errorMsg = document.getElementById('errorMessage');
+        const loginSection = document.getElementById('login-section');
+        const adminPanel = document.getElementById('admin-panel');
         
         auth.onAuthStateChanged(user => {
             if (user) {
-                document.getElementById('login-section').style.display = 'none';
-                document.getElementById('admin-panel').style.display = 'flex';
+                // User is logged in: Hide Login, Show Dashboard
+                loginSection.style.display = 'none';
+                adminPanel.style.display = 'flex'; // Restore flex for dashboard layout
                 document.getElementById('adminEmailDisplay').innerText = user.email;
                 initDashboard();
             } else {
-                document.getElementById('login-section').style.display = 'flex';
-                document.getElementById('admin-panel').style.display = 'none';
+                // User is logged out: Show Login, Hide Dashboard
+                loginSection.style.display = 'flex'; // Use flex for centering
+                adminPanel.style.display = 'none';
             }
         });
 
         loginForm.addEventListener('submit', (e) => {
             e.preventDefault();
-            const email = document.getElementById('loginEmail').value;
-            const pass = document.getElementById('loginPass').value;
             
-            auth.signInWithEmailAndPassword(email, pass)
+            // UI Loading State (Using the new design elements)
+            loginBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Verifying...';
+            loginBtn.disabled = true;
+            errorMsg.classList.add('hidden'); // Hide any previous errors
+
+            // IDs updated to match the new Tailwind Form IDs
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            auth.signInWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    // Success is handled by onAuthStateChanged
+                })
                 .catch((error) => {
-                    document.getElementById('loginError').style.display = 'block';
-                    document.getElementById('loginError').innerText = error.message;
+                    // Error: Reset Button and Show Message
+                    loginBtn.innerHTML = 'Secure Login <i class="fas fa-arrow-right ml-2"></i>';
+                    loginBtn.disabled = false;
+                    
+                    errorMsg.textContent = "Invalid Email or Password.";
+                    errorMsg.classList.remove('hidden');
+                    console.error(error.message);
                 });
         });
 
@@ -433,7 +474,7 @@
 
                     // All Donations Table
                     allDonationsHTML += `
-                         <tr>
+                          <tr>
                             <td>${data.donorName}</td>
                             <td>${data.email}</td>
                             <td>₹${Number(data.amount).toLocaleString('en-IN')}</td>
@@ -443,7 +484,7 @@
                     
                     // Donors Directory
                     donorsDirHTML += `
-                         <tr>
+                          <tr>
                             <td>${data.donorName}</td>
                             <td>${data.email}</td>
                             <td>${data.phone || 'N/A'}</td>
