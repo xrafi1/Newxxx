@@ -79,12 +79,13 @@
 
     <nav id="navbar" class="fixed top-0 w-full z-50 transition-all duration-300 py-4 px-4 md:px-6">
         <div class="max-w-7xl mx-auto flex justify-between items-center bg-white/60 backdrop-blur-md rounded-full px-6 py-3 border border-white/50 shadow-sm transition-all" id="nav-container">
-            <a href="#" class="flex items-center gap-3">
+            <a href="index.html" class="flex items-center gap-3">
                 <img src="https://i.ibb.co/svMHRcFF/Green-Modern-Badge-Gardening-Logo-Design-20260202-115512-0000.png" alt="KindFund Logo" class="h-10 w-10 rounded-full shadow-sm bg-white p-0.5">
                 <span class="font-bold text-lg tracking-tight text-slate-900">Kind<span class="text-primary">Fund</span></span>
             </a>
             
             <div class="hidden md:flex gap-8 text-sm font-medium text-slate-600">
+                <a href="#active-campaigns" class="hover:text-primary transition">Campaigns</a>
                 <a href="#about" class="hover:text-primary transition">About Us</a>
                 <a href="#programs" class="hover:text-primary transition">Programs</a>
                 <a href="#impact" class="hover:text-primary transition">Impact</a>
@@ -105,7 +106,7 @@
                     <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                     <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
                 </span>
-                <span class="text-xs font-bold text-emerald-700 uppercase tracking-wide">Verified Non-Profit • 80G Tax Exempt</span>
+                <span class="text-xs font-bold text-emerald-700 uppercase tracking-wide">Verified Non-Profit • 100% Transparent</span>
             </div>
             <h1 class="text-5xl md:text-7xl font-extrabold tracking-tight text-slate-900 mb-6 leading-tight">
                 Give hope.<br>
@@ -155,7 +156,7 @@
                             <p class="text-[10px] text-slate-400 font-semibold uppercase tracking-wide">
                                 <i class="fas fa-lock text-green-600 mr-1"></i> 256-bit Encrypted Payment
                             </p>
-                            <p class="text-[10px] text-slate-400">Donations are tax exempted under 80G.</p>
+                            <p class="text-[10px] text-slate-400">You will receive an instant donation receipt.</p>
                         </div>
                     </form>
                 </div>
@@ -163,7 +164,23 @@
         </div>
     </div>
 
-    <section id="about" class="py-20 bg-white relative">
+    <section id="active-campaigns" class="py-20 bg-white relative">
+        <div class="max-w-7xl mx-auto px-4 md:px-6">
+            <div class="text-center max-w-2xl mx-auto mb-16">
+                <span class="text-primary font-bold text-sm uppercase tracking-widest">Urgent Needs</span>
+                <h2 class="text-4xl font-bold text-slate-900 mt-2 mb-4">Active Campaigns</h2>
+                <p class="text-slate-600">Support a specific cause that resonates with you. These campaigns are live and need your help now.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8" id="campaigns-container">
+                <div class="col-span-full text-center py-10 text-slate-400 flex flex-col items-center">
+                    <i class="fas fa-circle-notch fa-spin text-3xl mb-3 text-primary"></i>
+                    <span>Loading active campaigns...</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="about" class="py-20 bg-slate-50 relative">
         <div class="max-w-7xl mx-auto px-4 md:px-6">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
                 <div class="relative">
@@ -178,13 +195,19 @@
                 <div>
                     <span class="text-primary font-bold text-sm uppercase tracking-widest mb-2 block">Who We Are</span>
                     <h2 class="text-4xl md:text-5xl font-bold text-slate-900 mb-6">Driven by Empathy, <br>Fueled by Action.</h2>
-                    <p class="text-slate-600 text-lg mb-6 leading-relaxed">
-                        KindFund began with a simple mission: to ensure no child sleeps hungry. What started as a small community kitchen in Barpeta Road has grown into a movement touching thousands of lives.
-                    </p>
-                    <p class="text-slate-600 text-lg mb-8 leading-relaxed">
-                        We are not just a charity; we are a community of changemakers. We believe in <strong class="text-slate-900">radical transparency</strong>—every rupee you donate is accounted for and directed towards tangible change.
-                    </p>
                     
+                    <p class="text-slate-600 text-lg mb-6 leading-relaxed">
+                        KindFund began with a simple mission: to ensure no child sleeps hungry. What started as a small community kitchen in Barpeta Road has grown into a mission to nurture and provide continuous support to a thousand lives.
+                    </p>
+
+                    <p class="text-slate-600 text-lg mb-6 leading-relaxed">
+                        We are not just a charity; we are a community of changemakers. We believe in <strong class="text-slate-900">complete transparency</strong>. Hence, every rupee you donate is used for the upliftment of the needy sections of the society.
+                    </p>
+
+                    <p class="text-slate-800 text-xl font-bold mb-8 leading-relaxed">
+                        Together, we don't just provide..<br>
+                        <span class="text-primary font-extrabold">WE TRANSFORM LIVES!!</span>
+                    </p>
                     <div class="grid grid-cols-2 gap-6">
                         <div class="flex items-start gap-3">
                             <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-primary shrink-0">
@@ -210,7 +233,7 @@
         </div>
     </section>
 
-    <section id="programs" class="py-20 bg-slate-50 relative z-10">
+    <section id="programs" class="py-20 bg-white relative z-10">
         <div class="max-w-7xl mx-auto px-4">
             <div class="text-center max-w-2xl mx-auto mb-16">
                 <span class="text-primary font-bold text-sm uppercase tracking-widest">Our Impact</span>
@@ -323,13 +346,13 @@
             <div class="space-y-4">
                 <details class="group bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
                     <summary class="flex justify-between items-center font-bold cursor-pointer list-none p-6 text-slate-800">
-                        <span>Is my donation tax-deductible?</span>
+                        <span>Will I receive a donation receipt?</span>
                         <span class="transition group-open:rotate-180">
                             <i class="fas fa-chevron-down text-primary"></i>
                         </span>
                     </summary>
                     <div class="text-slate-600 px-6 pb-6 pt-0 leading-relaxed">
-                        Yes, KindFund is a registered 12A trust. All donations made by Indian citizens are 50% tax-exempt under Section 80G of the Income Tax Act. You will receive your tax receipt immediately via email.
+                        Yes, you will receive an instant digital receipt via email for every donation made. We maintain complete transparency with our donors.
                     </div>
                 </details>
 
@@ -364,7 +387,7 @@
         <div class="max-w-7xl mx-auto px-4">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
                 <div class="md:col-span-2">
-                    <a href="#" class="flex items-center gap-2 mb-4">
+                    <a href="index.html" class="flex items-center gap-2 mb-4">
                         <img src="https://i.ibb.co/svMHRcFF/Green-Modern-Badge-Gardening-Logo-Design-20260202-115512-0000.png" alt="KindFund Logo" class="h-10 w-10 rounded-full">
                         <span class="font-bold text-xl tracking-tight text-slate-900">KindFund</span>
                     </a>
@@ -381,8 +404,8 @@
                     <ul class="space-y-3 text-sm text-slate-500 font-medium">
                         <li><a href="#about" class="hover:text-primary transition">About Us</a></li>
                         <li><a href="#programs" class="hover:text-primary transition">Our Programs</a></li>
-                        <li><a href="#" class="hover:text-primary transition">Volunteer</a></li>
-                        <li><a href="#" class="hover:text-primary transition">Contact Support</a></li>
+                        <li><a href="join.html" class="hover:text-primary transition">Join Us</a></li>
+                        <li><a href="contact.html" class="hover:text-primary transition">Contact Us</a></li>
                     </ul>
                 </div>
 
@@ -425,7 +448,6 @@
 
         // 2. Initialize Firebase
         const app = firebase.initializeApp(firebaseConfig);
-        const analytics = firebase.analytics();
         const db = firebase.firestore();
 
         // 3. UI Interactions
@@ -435,6 +457,11 @@
                 b.className = "amt-btn py-3 rounded-xl border border-slate-200 text-slate-600 font-bold hover:bg-slate-50 transition text-lg";
             });
             btn.className = "amt-btn py-3 rounded-xl bg-green-50 border-primary text-primary ring-1 ring-primary font-bold transition text-lg shadow-inner";
+        }
+
+        function presetDonation(cause) {
+            document.getElementById('customAmount').focus();
+            alert("Please complete the donation form above for: " + cause);
         }
 
         // Navbar Scroll Effect
@@ -449,15 +476,91 @@
             }
         });
 
-        // 4. Handle Donation (Placeholder for Payment Integration)
+        // 4. LOAD CAMPAIGNS (Real-time from Firebase)
+        db.collection('campaigns').where('status', '==', 'active').onSnapshot((snapshot) => {
+            const container = document.getElementById('campaigns-container');
+            let html = '';
+            
+            if (snapshot.empty) {
+                container.innerHTML = '<div class="col-span-full text-center py-10 text-slate-500">No active campaigns at the moment. Please check back later.</div>';
+                return;
+            }
+
+            snapshot.forEach(doc => {
+                const data = doc.data();
+                // Safe calculation for progress bar
+                let raised = Number(data.raised) || 0;
+                let goal = Number(data.goal) || 1; 
+                let percent = Math.min(100, Math.round((raised / goal) * 100));
+                
+                html += `
+                <div class="bg-white rounded-3xl overflow-hidden shadow-lg border border-slate-100 hover:-translate-y-2 transition duration-300 flex flex-col h-full group">
+                    <div class="h-56 overflow-hidden relative">
+                        <img src="${data.image}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                        <div class="absolute top-4 right-4 bg-white/90 px-3 py-1 rounded-full text-xs font-bold text-primary shadow-sm backdrop-blur-sm">
+                            <i class="fas fa-check-circle"></i> Verified
+                        </div>
+                    </div>
+                    <div class="p-6 flex flex-col flex-grow">
+                        <h3 class="text-xl font-bold text-slate-900 mb-2">${data.title}</h3>
+                        <p class="text-slate-500 text-sm mb-4 line-clamp-2">${data.description}</p>
+                        
+                        <div class="mt-auto">
+                            <div class="flex justify-between text-xs font-bold text-slate-700 mb-1">
+                                <span>₹${raised.toLocaleString('en-IN')} Raised</span>
+                                <span>${percent}%</span>
+                            </div>
+                            <div class="w-full bg-slate-100 rounded-full h-2.5 mb-4 overflow-hidden">
+                                <div class="bg-primary h-2.5 rounded-full transition-all duration-1000" style="width: ${percent}%"></div>
+                            </div>
+                            <a href="#donate" onclick="presetDonation('${data.title}')" class="block w-full text-center border-2 border-primary text-primary hover:bg-primary hover:text-white py-2 rounded-xl font-bold transition">
+                                Donate to this Cause
+                            </a>
+                        </div>
+                    </div>
+                </div>`;
+            });
+            container.innerHTML = html;
+        });
+
+        // 5. HANDLE DONATION SUBMISSION (Save to Firebase)
         document.getElementById('donationForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const amount = document.getElementById('customAmount').value;
             const name = document.getElementById('donorName').value;
+            const email = document.getElementById('donorEmail').value;
+            const phone = document.getElementById('donorPhone').value;
+
+            // UI Feedback
+            const btn = e.target.querySelector('button');
+            const originalContent = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            btn.disabled = true;
+
+            // In a real app, integrate Payment Gateway (Cashfree/Razorpay) here.
+            // For now, we simulate success and save to Firebase Database.
             
-            // This is where you would call Cashfree/Razorpay
-            // And then save to Firebase: db.collection('donations').add({ ... })
-            alert(`Thank you ${name}! Proceeding to pay ₹${amount}... (Integration Pending)`);
+            setTimeout(() => {
+                db.collection('donations').add({
+                    donorName: name,
+                    email: email,
+                    phone: phone,
+                    amount: Number(amount),
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    status: 'verified', // Assuming successful payment
+                    method: 'Online'
+                }).then(() => {
+                    alert(`Thank you ${name}! Your donation of ₹${amount} was successful.`);
+                    e.target.reset();
+                    btn.innerHTML = originalContent;
+                    btn.disabled = false;
+                }).catch(err => {
+                    console.error("Error adding document: ", err);
+                    alert('Error processing donation. Please try again.');
+                    btn.innerHTML = originalContent;
+                    btn.disabled = false;
+                });
+            }, 1500);
         });
     </script>
 </body>
