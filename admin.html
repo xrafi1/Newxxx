@@ -8,6 +8,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -33,22 +36,24 @@
             --radius: 12px;
         }
 
-        /* FIXED: Removed the '*' selector so icons can use their own font */
         #admin-panel { font-family: 'Inter', sans-serif; }
         
         body { background-color: var(--bg-color); color: var(--text-dark); height: 100vh; overflow: hidden; margin: 0; padding: 0; }
 
         /* --- UTILITIES --- */
         .btn { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; font-weight: 500; transition: 0.3s; display: inline-block; }
+        .btn-sm { padding: 6px 12px; font-size: 12px; }
         .btn-primary { background-color: var(--primary-green); color: white; }
         .btn-primary:hover { background-color: var(--dark-green); }
         .btn-danger { background-color: #ef4444; color: white; }
+        .btn-warning { background-color: #f59e0b; color: white; }
         .btn-outline { border: 1px solid #d1d5db; background: white; color: var(--text-dark); }
         .btn-outline:hover { background: #f9fafb; }
         
         .badge { padding: 4px 8px; border-radius: 20px; font-size: 12px; font-weight: 600; }
         .badge-success { background-color: var(--light-green); color: var(--dark-green); }
         .badge-pending { background-color: #fef3c7; color: #92400e; }
+        .badge-danger { background-color: #fee2e2; color: #991b1b; }
 
         /* --- DASHBOARD LAYOUT --- */
         #admin-panel { display: none; height: 100vh; display: flex; width: 100%; } 
@@ -119,7 +124,7 @@
 
         /* Simple Modal */
         .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4); justify-content: center; align-items: center; }
-        .modal-content { background-color: #fefefe; padding: 20px; border-radius: var(--radius); width: 90%; max-width: 500px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .modal-content { background-color: #fefefe; padding: 20px; border-radius: var(--radius); width: 90%; max-width: 600px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); max-height: 90vh; overflow-y: auto; }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .close { color: #aaa; font-size: 28px; font-weight: bold; cursor: pointer; }
         .close:hover { color: black; }
@@ -128,6 +133,9 @@
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.5); z-index: 900;
         }
+
+        .action-btns { display: flex; gap: 5px; }
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
@@ -138,6 +146,7 @@
             .content-area { padding: 15px; }
             .top-bar { padding: 15px; }
             .stat-card .value { font-size: 20px; }
+            .grid-2 { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -264,11 +273,17 @@
 
                 <div id="donations-section" class="section">
                     <div class="table-container">
-                        <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: space-between; margin-bottom: 20px;">
-                            <input type="text" placeholder="Search donors..." class="form-input" style="max-width: 300px;">
-                            <button class="btn btn-outline"><i class="fas fa-filter"></i> Filter</button>
+                        <div style="display: flex; flex-wrap: wrap; gap: 10px; justify-content: space-between; margin-bottom: 20px; align-items: center;">
+                            <div style="display:flex; gap: 10px;">
+                                <input type="text" placeholder="Search donors..." class="form-input" style="max-width: 200px;">
+                                <button class="btn btn-outline"><i class="fas fa-filter"></i></button>
+                            </div>
+                            <div style="display:flex; gap: 10px;">
+                                <button class="btn btn-outline" onclick="exportTableToPDF('allDonationsTable', 'Donations_Report')"><i class="fas fa-file-pdf" style="color: #ef4444;"></i> Export PDF</button>
+                                <button class="btn btn-primary" onclick="openDonationModal('add')"><i class="fas fa-plus"></i> Add Donation</button>
+                            </div>
                         </div>
-                        <table>
+                        <table id="donationsTableFull">
                             <thead>
                                 <tr>
                                     <th>Donor Name</th>
@@ -276,10 +291,10 @@
                                     <th>Amount</th>
                                     <th>Date</th>
                                     <th>Status</th>
-                                </tr>
+                                    <th>Actions</th> </tr>
                             </thead>
                             <tbody id="allDonationsTable">
-                                </tbody>
+                            </tbody>
                         </table>
                     </div>
                 </div>
@@ -289,52 +304,55 @@
                         <button class="btn btn-primary" onclick="openCampaignModal()"><i class="fas fa-plus"></i> New Campaign</button>
                     </div>
                     <div class="campaign-grid" id="campaignsGrid">
-                        </div>
+                    </div>
                 </div>
 
                 <div id="donors-section" class="section">
                     <div class="table-container">
-                        <h3>Registered Donors (Recent)</h3>
-                        <br>
-                        <table>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 20px; align-items: center;">
+                            <h3>Registered Donors Directory</h3>
+                            <div style="display:flex; gap: 10px;">
+                                <button class="btn btn-outline" onclick="exportTableToPDF('donorsDirectoryTable', 'Donors_List')"><i class="fas fa-file-pdf" style="color: #ef4444;"></i> Export PDF</button>
+                                <button class="btn btn-primary" onclick="openDonorModal('add')"><i class="fas fa-user-plus"></i> Add Donor</button>
+                            </div>
+                        </div>
+                        <table id="donorsTableFull">
                             <thead>
                                 <tr>
                                     <th>Name</th>
                                     <th>Email</th>
                                     <th>Phone</th>
-                                    <th>Latest Donation</th>
-                                </tr>
+                                    <th>Notes</th>
+                                    <th>Actions</th> </tr>
                             </thead>
                             <tbody id="donorsDirectoryTable">
-                                </tbody>
+                            </tbody>
                         </table>
                     </div>
                 </div>
 
                 <div id="requests-section" class="section">
                     <div class="table-container">
-                        <h3>NGO Volunteer Requests</h3>
-                        <br>
-                        <table>
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 20px; align-items: center;">
+                            <h3>Join Us Requests (Volunteers)</h3>
+                             <div style="display:flex; gap: 10px;">
+                                <button class="btn btn-outline" onclick="exportTableToPDF('volunteerTable', 'Volunteers_List')"><i class="fas fa-file-pdf" style="color: #ef4444;"></i> Export PDF</button>
+                                </div>
+                        </div>
+                        <table id="volunteersTableFull">
                             <thead>
                                 <tr>
-                                    <th>Name</th>
-                                    <th>Email</th>
-                                    <th>Interest</th>
-                                    <th>Reason</th>
+                                    <th>Full Name</th>
+                                    <th>Contact Info</th>
+                                    <th>City/State</th>
+                                    <th>Skills & Availability</th>
+                                    <th>Status</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="volunteerTable">
-                                </tbody>
+                            </tbody>
                         </table>
-                    </div>
-                </div>
-
-                <div id="settings-section" class="section">
-                     <div class="table-container">
-                        <h3>System Settings</h3>
-                        <p style="color: gray; margin-top: 10px;">Firebase Connection: <strong style="color: var(--primary-green);">Active</strong></p>
                     </div>
                 </div>
 
@@ -370,6 +388,126 @@
         </div>
     </div>
 
+    <div id="donationModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="donationModalTitle">Add Donation</h3>
+                <span class="close" onclick="document.getElementById('donationModal').style.display='none'">&times;</span>
+            </div>
+            <form id="donationForm">
+                <input type="hidden" id="donationId"> <div class="form-group">
+                    <label>Donor Name</label>
+                    <input type="text" id="donName" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label>Donor Email</label>
+                    <input type="email" id="donEmail" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label>Amount (₹)</label>
+                    <input type="number" id="donAmount" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label>Date</label>
+                    <input type="date" id="donDate" class="form-input">
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Save Record</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="donorModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="donorModalTitle">Add Donor</h3>
+                <span class="close" onclick="document.getElementById('donorModal').style.display='none'">&times;</span>
+            </div>
+            <form id="donorForm">
+                <input type="hidden" id="donorId">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="dName" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" id="dEmail" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input type="tel" id="dPhone" class="form-input" placeholder="+91...">
+                </div>
+                 <div class="form-group">
+                    <label>Notes</label>
+                    <input type="text" id="dNotes" class="form-input">
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Save Donor</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="volunteerModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="volunteerModalTitle">Volunteer Application Details</h3>
+                <span class="close" onclick="document.getElementById('volunteerModal').style.display='none'">&times;</span>
+            </div>
+            <form id="volunteerForm">
+                <input type="hidden" id="volId">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="vName" class="form-input" required>
+                </div>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="vEmail" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Mobile Number</label>
+                        <input type="text" id="vMobile" class="form-input">
+                    </div>
+                </div>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>City / State</label>
+                        <input type="text" id="vCity" class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label>Age</label>
+                        <input type="number" id="vAge" class="form-input">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Education</label>
+                    <input type="text" id="vEducation" class="form-input">
+                </div>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>Skills</label>
+                        <input type="text" id="vSkills" class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label>Availability</label>
+                        <select id="vAvailability" class="form-input">
+                            <option>Weekend</option>
+                            <option>Part-time</option>
+                            <option>Full-time</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Experience</label>
+                    <textarea id="vExperience" class="form-input" rows="2"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Reason for Joining</label>
+                    <textarea id="vReason" class="form-input" rows="3"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Save Changes</button>
+            </form>
+        </div>
+    </div>
+
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
@@ -398,95 +536,87 @@
         
         auth.onAuthStateChanged(user => {
             if (user) {
-                // User is logged in: Hide Login, Show Dashboard
                 loginSection.style.display = 'none';
-                adminPanel.style.display = 'flex'; // Restore flex for dashboard layout
+                adminPanel.style.display = 'flex';
                 document.getElementById('adminEmailDisplay').innerText = user.email;
                 initDashboard();
             } else {
-                // User is logged out: Show Login, Hide Dashboard
-                loginSection.style.display = 'flex'; // Use flex for centering
+                loginSection.style.display = 'flex';
                 adminPanel.style.display = 'none';
             }
         });
 
         loginForm.addEventListener('submit', (e) => {
             e.preventDefault();
-            
-            // UI Loading State (Using the new design elements)
             loginBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Verifying...';
             loginBtn.disabled = true;
-            errorMsg.classList.add('hidden'); // Hide any previous errors
+            errorMsg.classList.add('hidden');
 
-            // IDs updated to match the new Tailwind Form IDs
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             
             auth.signInWithEmailAndPassword(email, password)
-                .then((userCredential) => {
-                    // Success is handled by onAuthStateChanged
-                })
+                .then(() => {})
                 .catch((error) => {
-                    // Error: Reset Button and Show Message
                     loginBtn.innerHTML = 'Secure Login <i class="fas fa-arrow-right ml-2"></i>';
                     loginBtn.disabled = false;
-                    
                     errorMsg.textContent = "Invalid Email or Password.";
                     errorMsg.classList.remove('hidden');
-                    console.error(error.message);
                 });
         });
 
-        function logout() {
-            auth.signOut();
-        }
+        function logout() { auth.signOut(); }
 
         // 3. Dashboard Data Logic
         function initDashboard() {
             renderChart();
             
-            // Listen to Donations
+            // --- DONATIONS ---
             db.collection('donations').orderBy('timestamp', 'desc').onSnapshot(snapshot => {
                 let totalAmount = 0;
                 let donorsCount = snapshot.size;
                 let recentHTML = '';
                 let allDonationsHTML = '';
-                let donorsDirHTML = '';
 
                 snapshot.docs.forEach((doc, index) => {
                     const data = doc.data();
-                    totalAmount += Number(data.amount);
+                    const amount = Number(data.amount || 0);
+                    if(data.status !== 'Refunded') {
+                        totalAmount += amount;
+                    }
                     
                     const date = data.timestamp ? new Date(data.timestamp.seconds * 1000).toLocaleDateString() : 'N/A';
-                    
+                    const statusColor = data.status === 'Refunded' ? 'badge-danger' : 'badge-success';
+                    const statusText = data.status || 'Verified';
+
                     // Recent Table (First 5)
                     if (index < 5) {
                         recentHTML += `
                             <tr>
                                 <td>${data.donorName}</td>
-                                <td>₹${Number(data.amount).toLocaleString('en-IN')}</td>
+                                <td>₹${amount.toLocaleString('en-IN')}</td>
                                 <td>${date}</td>
-                                <td><span class="badge badge-success">Completed</span></td>
+                                <td><span class="badge ${statusColor}">${statusText}</span></td>
                             </tr>`;
                     }
 
                     // All Donations Table
+                    const safeName = (data.donorName || '').replace(/'/g, "\\'");
+                    const safeEmail = (data.email || '').replace(/'/g, "\\'");
+                    
                     allDonationsHTML += `
                           <tr>
                             <td>${data.donorName}</td>
                             <td>${data.email}</td>
-                            <td>₹${Number(data.amount).toLocaleString('en-IN')}</td>
+                            <td>₹${amount.toLocaleString('en-IN')}</td>
                             <td>${date}</td>
-                            <td><span class="badge badge-success">Verified</span></td>
-                        </tr>`;
-                    
-                    // Donors Directory
-                    donorsDirHTML += `
-                          <tr>
-                            <td>${data.donorName}</td>
-                            <td>${data.email}</td>
-                            <td>${data.phone || 'N/A'}</td>
-                            <td>₹${Number(data.amount).toLocaleString('en-IN')}</td>
+                            <td><span class="badge ${statusColor}">${statusText}</span></td>
+                            <td>
+                                <div class="action-btns">
+                                    <button class="btn btn-sm btn-outline" onclick="openDonationModal('edit', '${doc.id}', '${safeName}', '${safeEmail}', '${amount}', '${date}')"><i class="fas fa-edit"></i></button>
+                                    ${data.status !== 'Refunded' ? `<button class="btn btn-sm btn-danger" onclick="refundDonation('${doc.id}')"><i class="fas fa-undo"></i></button>` : ''}
+                                </div>
+                            </td>
                         </tr>`;
                 });
 
@@ -494,20 +624,40 @@
                 document.getElementById('totalDonors').innerText = donorsCount;
                 document.getElementById('recentTxnTable').innerHTML = recentHTML;
                 document.getElementById('allDonationsTable').innerHTML = allDonationsHTML;
+            });
+
+            // --- DONORS ---
+            db.collection('donors').onSnapshot(snapshot => {
+                let donorsDirHTML = '';
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const safeName = (data.name || '').replace(/'/g, "\\'");
+                    const safeEmail = (data.email || '').replace(/'/g, "\\'");
+                    const safePhone = (data.phone || '').replace(/'/g, "\\'");
+                    const safeNotes = (data.notes || '').replace(/'/g, "\\'");
+
+                    donorsDirHTML += `
+                          <tr>
+                            <td>${data.name}</td>
+                            <td>${data.email}</td>
+                            <td>${data.phone || 'N/A'}</td>
+                            <td>${data.notes || '-'}</td>
+                            <td>
+                                <button class="btn btn-sm btn-outline" onclick="openDonorModal('edit', '${doc.id}', '${safeName}', '${safeEmail}', '${safePhone}', '${safeNotes}')"><i class="fas fa-edit"></i></button>
+                            </td>
+                        </tr>`;
+                });
                 document.getElementById('donorsDirectoryTable').innerHTML = donorsDirHTML;
             });
 
-            // Listen to Campaigns
+            // --- CAMPAIGNS ---
             db.collection('campaigns').onSnapshot(snapshot => {
                 let activeCount = 0;
                 let gridHTML = '';
-                
                 snapshot.forEach(doc => {
                     const data = doc.data();
                     if(data.status !== 'paused') activeCount++;
-                    
                     const percent = Math.min(100, Math.round((data.raised / data.goal) * 100));
-                    
                     gridHTML += `
                         <div class="campaign-card">
                             <div class="campaign-img" style="background-image: url('${data.image}');"></div>
@@ -525,25 +675,56 @@
                             </div>
                         </div>`;
                 });
-
                 document.getElementById('activeCampaignsCount').innerText = activeCount;
                 document.getElementById('campaignsGrid').innerHTML = gridHTML;
             });
 
-            // Listen to Volunteers
+            // --- VOLUNTEERS (Updated to match join.html fields) ---
             db.collection('volunteers').orderBy('timestamp', 'desc').onSnapshot(snapshot => {
                 document.getElementById('pendingVolunteers').innerText = snapshot.size;
                 let html = '';
                 snapshot.forEach(doc => {
                     const data = doc.data();
+                    const isVerified = data.status === 'Verified';
+                    const statusBadge = isVerified ? '<span class="badge badge-success">Verified</span>' : '<span class="badge badge-pending">Pending</span>';
+                    
+                    // Prepare data safely for the onclick function
+                    // We must escape quotes in the string data
+                    const safeName = (data.fullName || '').replace(/'/g, "\\'");
+                    const safeEmail = (data.email || '').replace(/'/g, "\\'");
+                    const safeMobile = (data.mobile || '').replace(/'/g, "\\'");
+                    const safeCity = (data.city || '').replace(/'/g, "\\'");
+                    const safeAge = data.age || '';
+                    const safeEdu = (data.education || '').replace(/'/g, "\\'");
+                    const safeSkills = (data.skills || '').replace(/'/g, "\\'");
+                    const safeAvail = (data.availability || '').replace(/'/g, "\\'");
+                    const safeExp = (data.experience || '').replace(/'/g, "\\'");
+                    const safeReason = (data.reason || '').replace(/'/g, "\\'");
+
                     html += `
                         <tr>
-                            <td>${data.firstName} ${data.lastName}</td>
-                            <td>${data.email}</td>
-                            <td>${data.area}</td>
-                            <td>"${data.reason.substring(0,30)}..."</td>
                             <td>
-                                <button class="btn btn-danger" onclick="deleteVolunteer('${doc.id}')" style="padding: 5px 10px; font-size: 12px;">Remove</button>
+                                <div class="font-bold text-slate-800">${data.fullName}</div>
+                                <div class="text-xs text-slate-500">Age: ${data.age || 'N/A'}</div>
+                            </td>
+                            <td>
+                                <div>${data.email}</div>
+                                <div class="text-xs text-slate-500">${data.mobile || ''}</div>
+                            </td>
+                            <td>${data.city || 'N/A'}</td>
+                            <td>
+                                <div class="text-xs font-bold text-primary">${data.availability || ''}</div>
+                                <div class="text-xs text-slate-500">${data.skills || ''}</div>
+                            </td>
+                            <td>${statusBadge}</td>
+                            <td>
+                                <div class="action-btns">
+                                    <button class="btn btn-sm btn-outline" onclick="openVolunteerModal('${doc.id}', '${safeName}', '${safeEmail}', '${safeMobile}', '${safeCity}', '${safeAge}', '${safeEdu}', '${safeSkills}', '${safeAvail}', '${safeExp}', '${safeReason}')">
+                                        <i class="fas fa-eye"></i> View
+                                    </button>
+                                    ${!isVerified ? `<button class="btn btn-sm btn-primary" onclick="verifyVolunteer('${doc.id}')"><i class="fas fa-check"></i></button>` : ''}
+                                    <button class="btn btn-sm btn-danger" onclick="deleteVolunteer('${doc.id}')"><i class="fas fa-trash"></i></button>
+                                </div>
                             </td>
                         </tr>`;
                 });
@@ -551,7 +732,143 @@
             });
         }
 
-        // 4. Action Functions
+        // 4. FEATURE FUNCTIONS
+
+        // --- PDF EXPORT ---
+        function exportTableToPDF(tableId, filename) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            doc.setFontSize(18);
+            doc.text("KindFund Report", 14, 20);
+            doc.setFontSize(11);
+            doc.text("Generated: " + new Date().toLocaleDateString(), 14, 28);
+            doc.autoTable({ html: '#' + tableId, startY: 35 });
+            doc.save(filename + '.pdf');
+        }
+
+        // --- DONATION HANDLERS ---
+        function openDonationModal(mode, id, name, email, amount, date) {
+            const modal = document.getElementById('donationModal');
+            modal.style.display = 'flex';
+            document.getElementById('donationModalTitle').innerText = mode === 'add' ? 'Add Donation' : 'Edit Donation';
+            document.getElementById('donationId').value = id || ''; 
+            if(mode === 'edit') {
+                document.getElementById('donName').value = name;
+                document.getElementById('donEmail').value = email;
+                document.getElementById('donAmount').value = amount;
+            } else {
+                document.getElementById('donationForm').reset();
+            }
+        }
+
+        document.getElementById('donationForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const id = document.getElementById('donationId').value;
+            const data = {
+                donorName: document.getElementById('donName').value,
+                email: document.getElementById('donEmail').value,
+                amount: Number(document.getElementById('donAmount').value),
+                status: 'Verified',
+                timestamp: document.getElementById('donDate').value ? firebase.firestore.Timestamp.fromDate(new Date(document.getElementById('donDate').value)) : firebase.firestore.FieldValue.serverTimestamp()
+            };
+            if(id) db.collection('donations').doc(id).update(data);
+            else db.collection('donations').add(data);
+            document.getElementById('donationModal').style.display='none';
+            alert('Donation Saved!');
+        });
+
+        function refundDonation(id) {
+            if(confirm("Are you sure you want to refund this donation?")) {
+                db.collection('donations').doc(id).update({ status: 'Refunded' });
+            }
+        }
+
+        // --- DONOR HANDLERS ---
+        function openDonorModal(mode, id, name, email, phone, notes) {
+            document.getElementById('donorModal').style.display = 'flex';
+            document.getElementById('donorModalTitle').innerText = mode === 'add' ? 'Add Donor' : 'Edit Donor';
+            document.getElementById('donorId').value = id || '';
+            if(mode === 'edit') {
+                document.getElementById('dName').value = name;
+                document.getElementById('dEmail').value = email;
+                document.getElementById('dPhone').value = phone;
+                document.getElementById('dNotes').value = notes;
+            } else {
+                document.getElementById('donorForm').reset();
+            }
+        }
+
+        document.getElementById('donorForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const id = document.getElementById('donorId').value;
+            const data = {
+                name: document.getElementById('dName').value,
+                email: document.getElementById('dEmail').value,
+                phone: document.getElementById('dPhone').value,
+                notes: document.getElementById('dNotes').value,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            };
+            if(id) db.collection('donors').doc(id).update(data);
+            else db.collection('donors').add(data);
+            document.getElementById('donorModal').style.display='none';
+            alert('Donor Saved!');
+        });
+
+        // --- VOLUNTEER HANDLERS (Updated) ---
+        function openVolunteerModal(id, name, email, mobile, city, age, edu, skills, avail, exp, reason) {
+            document.getElementById('volunteerModal').style.display = 'flex';
+            document.getElementById('volId').value = id;
+            
+            // Fill all fields from join.html structure
+            document.getElementById('vName').value = name;
+            document.getElementById('vEmail').value = email;
+            document.getElementById('vMobile').value = mobile;
+            document.getElementById('vCity').value = city;
+            document.getElementById('vAge').value = age;
+            document.getElementById('vEducation').value = edu;
+            document.getElementById('vSkills').value = skills;
+            document.getElementById('vAvailability').value = avail;
+            document.getElementById('vExperience').value = exp;
+            document.getElementById('vReason').value = reason;
+        }
+
+        document.getElementById('volunteerForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const id = document.getElementById('volId').value;
+            // Map inputs back to Firestore fields used in join.html
+            const data = {
+                fullName: document.getElementById('vName').value,
+                email: document.getElementById('vEmail').value,
+                mobile: document.getElementById('vMobile').value,
+                city: document.getElementById('vCity').value,
+                age: document.getElementById('vAge').value,
+                education: document.getElementById('vEducation').value,
+                skills: document.getElementById('vSkills').value,
+                availability: document.getElementById('vAvailability').value,
+                experience: document.getElementById('vExperience').value,
+                reason: document.getElementById('vReason').value
+            };
+
+            if(id) {
+                db.collection('volunteers').doc(id).update(data);
+            }
+            document.getElementById('volunteerModal').style.display='none';
+            alert('Request Updated!');
+        });
+
+        function verifyVolunteer(id) {
+            if(confirm("Verify this volunteer application?")) {
+                db.collection('volunteers').doc(id).update({ status: 'Verified' });
+            }
+        }
+
+        function deleteVolunteer(id) {
+            if(confirm("Permanently delete this application?")) {
+                db.collection('volunteers').doc(id).delete();
+            }
+        }
+
+        // --- UTILS ---
         function openCampaignModal() { document.getElementById('campaignModal').style.display = 'flex'; }
         function closeCampaignModal() { document.getElementById('campaignModal').style.display = 'none'; }
         
@@ -578,13 +895,6 @@
             }
         }
 
-        function deleteVolunteer(id) {
-            if(confirm("Remove this request?")) {
-                db.collection('volunteers').doc(id).delete();
-            }
-        }
-
-        // Navigation & Layout Logic
         function showSection(sectionId, element) {
             document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
             document.getElementById(sectionId).classList.add('active');
@@ -597,7 +907,7 @@
                 'donations-section': 'Donation Management',
                 'campaigns-section': 'Campaign Management',
                 'donors-section': 'Donor Directory',
-                'requests-section': 'Volunteer Requests',
+                'requests-section': 'Volunteer Applications',
                 'settings-section': 'System Settings'
             };
             document.getElementById('page-header').innerText = titles[sectionId];
@@ -615,10 +925,10 @@
             new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: ['Start', 'Current'],
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May'],
                     datasets: [{
                         label: 'Growth Trend',
-                        data: [0, 50000], // Placeholder for dynamic chart
+                        data: [12000, 19000, 3000, 5000, 20000],
                         borderColor: '#10b981',
                         backgroundColor: 'rgba(16, 185, 129, 0.1)',
                         borderWidth: 2,
@@ -630,7 +940,7 @@
                     responsive: true,
                     maintainAspectRatio: false,
                     plugins: { legend: { display: false } },
-                    scales: { y: { beginAtZero: true }, x: { display: false } }
+                    scales: { y: { beginAtZero: true }, x: { display: true } }
                 }
             });
         }
