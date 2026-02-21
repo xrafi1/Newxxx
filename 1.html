@@ -482,7 +482,6 @@
         const app = firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // Updated pick function handles either form (main or modal)
         function pick(amount, btn, formType) {
             let inputId = formType === 'modal' ? 'campCustomAmount' : 'customAmount';
             let btnClass = formType === 'modal' ? '.amt-btn-modal' : '.amt-btn-main';
@@ -494,7 +493,6 @@
             btn.className = `${btnClass.substring(1)} py-3 rounded-xl bg-green-50 border-primary text-primary ring-1 ring-primary font-bold transition text-lg shadow-inner`;
         }
 
-        // --- NEW: Open a Separate Payment Modal ---
         function openCampModal(title, id) {
             document.getElementById('campModalHeading').innerText = title;
             document.getElementById('hiddenCampId').value = id;
@@ -577,7 +575,7 @@
             btn.disabled = true;
 
             var options = {
-                "key": "rzp_live_Rihc2h9vrv66iE",
+                "key": "rzp_test_SIkLAdWQzf9tHw", // UPDATED TEST KEY
                 "amount": amount * 100,
                 "currency": "INR",
                 "name": "KindFund",
