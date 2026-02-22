@@ -158,11 +158,11 @@
 
                                 <div class="relative">
                                     <span class="absolute left-4 top-3 text-slate-400 font-bold text-lg">₹</span>
-                                    <input type="number" id="custom-amount" value="" min="1" class="w-full pl-9 pr-4 py-3 bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition font-extrabold text-slate-900 text-lg shadow-sm" placeholder="Enter custom amount">
+                                    <input type="number" id="custom-amount" value="1000" min="1" class="w-full pl-9 pr-4 py-3 bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition font-extrabold text-slate-900 text-lg shadow-sm" placeholder="Enter custom amount">
                                 </div>
                             </div>
 
-                            <div class="space-y-4">
+                            <div class="space-y-4" id="action-buttons-container">
                                 <button id="donate-btn" class="w-full bg-slate-900 text-white py-4 rounded-xl font-bold text-lg shadow-xl shadow-slate-900/20 transition transform hover:-translate-y-1 flex justify-center items-center gap-2 group opacity-50 cursor-not-allowed" disabled>
                                     <span id="donate-btn-text">Loading...</span>
                                     <i class="fas fa-heart text-red-500 animate-pulse-slow group-hover:scale-125 transition"></i>
@@ -217,20 +217,14 @@
 
         presetBtns.forEach(btn => {
             btn.addEventListener('click', () => {
-                // Update input value
                 customAmountInput.value = btn.getAttribute('data-amount');
-                
-                // Reset styles for all buttons
                 presetBtns.forEach(b => {
                     b.className = "preset-btn border border-slate-200 bg-white rounded-xl py-2.5 font-bold text-slate-600 hover:border-primary hover:text-primary transition";
                 });
-                
-                // Set active style for clicked button
                 btn.className = "preset-btn border-2 border-primary bg-primary/5 rounded-xl py-2.5 font-bold text-primary transition";
             });
         });
 
-        // Remove active button style if user types manually
         customAmountInput.addEventListener('input', () => {
             presetBtns.forEach(b => {
                 b.className = "preset-btn border border-slate-200 bg-white rounded-xl py-2.5 font-bold text-slate-600 hover:border-primary hover:text-primary transition";
@@ -242,7 +236,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // Your Firebase config
         const firebaseConfig = {
             apiKey: "AIzaSyBunVS2o_nEvQNtcz68VwNCUGBS0Qufi7E",
             authDomain: "kvadmin-a9a5d.firebaseapp.com",
@@ -264,38 +257,32 @@
                 if (docSnap.exists()) {
                     const data = docSnap.data();
 
-                    // Update Title
-                    const titleEl = document.getElementById('frontend-title');
-                    titleEl.innerText = data.title || "Help Rebuild";
-                    titleEl.classList.remove('skeleton', 'text-transparent');
+                    // Update UI Elements
+                    document.getElementById('frontend-title').innerText = data.title || "Help Rebuild";
+                    document.getElementById('frontend-title').classList.remove('skeleton', 'text-transparent');
                     document.title = `${data.title} - KindFund`;
 
-                    // Update Image
                     const imgEl = document.getElementById('frontend-image');
-                    const imgContainer = document.getElementById('frontend-image-container');
                     if(data.image) {
                         imgEl.src = data.image;
                         imgEl.onload = () => {
                             imgEl.classList.remove('opacity-0');
-                            imgContainer.classList.remove('skeleton');
+                            document.getElementById('frontend-image-container').classList.remove('skeleton');
                         };
                     }
 
-                    // Update Description
-                    const descEl = document.getElementById('frontend-desc');
-                    descEl.innerText = data.description || "Story not available.";
-                    descEl.classList.remove('skeleton', 'text-transparent');
+                    document.getElementById('frontend-desc').innerText = data.description || "Story not available.";
+                    document.getElementById('frontend-desc').classList.remove('skeleton', 'text-transparent');
 
-                    // Activate Donate Button
                     const donateBtn = document.getElementById('donate-btn');
-                    const donateBtnText = document.getElementById('donate-btn-text');
-                    
-                    donateBtnText.innerText = "Donate Now";
+                    document.getElementById('donate-btn-text').innerText = "Donate Now";
                     donateBtn.disabled = false;
                     donateBtn.classList.remove('opacity-50', 'cursor-not-allowed');
                     donateBtn.classList.add('hover:bg-primary');
 
-                    // Payment Execution Logic
+                    // ==========================================
+                    // FIXED PAYMENT EXECUTION LOGIC
+                    // ==========================================
                     donateBtn.onclick = () => {
                         const amount = document.getElementById('custom-amount').value;
                         
@@ -305,18 +292,51 @@
                         }
 
                         if(data.upi) {
-                            // Show confirmation including the custom amount
-                            alert(`Proceeding to pay: ₹${amount}\n\nSending to UPI ID: ${data.upi}\n\n(In production, this button will open Google Pay/PhonePe natively.)`);
-                            
-                            // Native UPI deep link logic (Uncomment in production)
-                            // window.location.href = `upi://pay?pa=${data.upi}&pn=KindFund&cu=INR&am=${amount}`;
+                            // Safely encode the parameters for the URL
+                            const upiID = data.upi;
+                            const campaignName = encodeURIComponent(data.title || "KindFund Campaign");
+                            const upiLink = `upi://pay?pa=${upiID}&pn=${campaignName}&am=${amount}&cu=INR`;
+
+                            // Detect if the user is on a mobile device
+                            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+                            if (isMobile) {
+                                // On Mobile: Open the UPI intent directly (GPay, PhonePe, etc.)
+                                window.location.href = upiLink;
+                            } else {
+                                // On Desktop: Display a scannable QR Code dynamically
+                                let qrDiv = document.getElementById('qr-display');
+                                
+                                if(!qrDiv) {
+                                    qrDiv = document.createElement('div');
+                                    qrDiv.id = 'qr-display';
+                                    qrDiv.className = 'mt-4 bg-slate-50 p-5 rounded-2xl border border-slate-200 text-center shadow-inner transition-all';
+                                    
+                                    // Inject it right below the action buttons
+                                    document.getElementById('action-buttons-container').appendChild(qrDiv);
+                                }
+                                
+                                // Free API to generate QR Code instantly
+                                const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiLink)}`;
+                                
+                                qrDiv.innerHTML = `
+                                    <p class="text-sm font-bold text-slate-800 mb-3">Scan to Pay via any UPI App</p>
+                                    <div class="bg-white p-2 rounded-xl inline-block shadow-sm border border-slate-100 mb-3">
+                                        <img src="${qrApiUrl}" class="w-40 h-40 object-contain" alt="UPI QR Code">
+                                    </div>
+                                    <div class="flex items-baseline justify-center gap-1">
+                                        <span class="text-lg font-bold text-slate-400">₹</span>
+                                        <span class="text-3xl font-extrabold text-primary">${amount}</span>
+                                    </div>
+                                    <p class="text-xs text-slate-500 font-mono mt-1 break-all">${upiID}</p>
+                                `;
+                            }
                         } else {
                             alert("Payment details are currently unavailable.");
                         }
                     };
 
                 } else {
-                    console.log("No campaign data found in database.");
                     document.getElementById('frontend-title').innerText = "Campaign Not Found";
                     document.getElementById('frontend-title').classList.remove('skeleton', 'text-transparent');
                     document.getElementById('frontend-desc').classList.remove('skeleton', 'text-transparent');
