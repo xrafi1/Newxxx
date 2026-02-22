@@ -3,245 +3,139 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - KindFund</title>
-    
+    <title>Help Sarah Rebuild - KindFund</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    colors: {
-                        primary: '#059669', // Emerald 600
-                        primaryDark: '#047857', // Emerald 700
-                        dark: '#0f172a',    // Slate 900
-                    },
-                    fontFamily: {
-                        sans: ['DM Sans', 'sans-serif'],
-                    },
-                    animation: {
-                        'blob': 'blob 7s infinite',
-                    },
-                    keyframes: {
-                        blob: {
-                            '0%': { transform: 'translate(0px, 0px) scale(1)' },
-                            '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
-                            '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
-                            '100%': { transform: 'translate(0px, 0px) scale(1)' },
-                        }
-                    }
+                    colors: { primary: '#059669', primaryDark: '#047857', dark: '#0f172a' },
+                    fontFamily: { sans: ['DM Sans', 'sans-serif'] },
+                    animation: { 'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite' }
                 }
             }
         }
     </script>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
     <style>
         body { font-family: 'DM Sans', sans-serif; }
-        
         .glass-card {
-            background: rgba(255, 255, 255, 0.85);
+            background: rgba(255, 255, 255, 0.7);
             backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.5);
         }
-
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #f1f5f9; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        .skeleton {
+            background: linear-gradient(110deg, #ececec 8%, #f5f5f5 18%, #ececec 33%);
+            background-size: 200% 100%;
+            animation: 1.5s shine linear infinite;
+        }
+        @keyframes shine { to { background-position-x: -200%; } }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 antialiased relative min-h-screen flex flex-col">
 
-    <div class="fixed inset-0 z-0 overflow-hidden pointer-events-none">
-        <div class="absolute top-0 left-1/4 w-96 h-96 bg-green-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
-        <div class="absolute top-0 right-1/4 w-96 h-96 bg-teal-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob" style="animation-delay: 2s;"></div>
-        <div class="absolute -bottom-32 left-1/3 w-96 h-96 bg-yellow-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob" style="animation-delay: 4s;"></div>
-    </div>
-
-    <div id="login-section" class="relative z-10 flex-grow flex items-center justify-center p-4 min-h-screen">
-        <div class="glass-card rounded-3xl p-8 max-w-md w-full shadow-2xl relative overflow-hidden">
-            <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-primary via-teal-400 to-primary"></div>
-            
-            <div class="text-center mb-8">
-                <img src="https://i.ibb.co/svMHRcFF/Green-Modern-Badge-Gardening-Logo-Design-20260202-115512-0000.png" alt="Logo" class="h-16 w-16 mx-auto rounded-full shadow-sm bg-white p-0.5 mb-4">
-                <h1 class="text-2xl font-extrabold text-slate-900">Admin Login</h1>
-                <p class="text-sm text-slate-500 mt-1">Access KindFund donation records</p>
-            </div>
-
-            <form id="login-form" class="space-y-5" onsubmit="handleLogin(event)">
-                <div>
-                    <label class="block text-sm font-bold text-slate-700 mb-1">Email Address</label>
-                    <div class="relative">
-                        <i class="fas fa-envelope absolute left-4 top-3.5 text-slate-400"></i>
-                        <input type="email" id="email" required class="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition" placeholder="admin@kindfund.com" value="admin@kindfund.com">
-                    </div>
-                </div>
-                <div>
-                    <label class="block text-sm font-bold text-slate-700 mb-1">Password</label>
-                    <div class="relative">
-                        <i class="fas fa-lock absolute left-4 top-3.5 text-slate-400"></i>
-                        <input type="password" id="password" required class="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition" placeholder="••••••••" value="password">
-                    </div>
-                </div>
-                <button type="submit" class="w-full bg-slate-900 text-white py-3.5 rounded-xl font-bold text-base shadow-lg hover:bg-primary transition transform hover:-translate-y-0.5 mt-2">
-                    Sign In to Dashboard
-                </button>
-            </form>
+    <nav class="fixed top-0 w-full z-50 py-4 px-4 md:px-6 bg-white/80 backdrop-blur-md border-b border-white/50 shadow-sm">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <a href="#" class="flex items-center gap-3">
+                <img src="https://i.ibb.co/svMHRcFF/Green-Modern-Badge-Gardening-Logo-Design-20260202-115512-0000.png" class="h-10 w-10 rounded-full">
+                <span class="font-bold text-lg text-slate-900">Kind<span class="text-primary">Fund</span></span>
+            </a>
+            <a href="#donate-box" class="bg-slate-900 text-white px-6 py-2.5 rounded-full text-sm font-bold hover:bg-primary transition">Donate Now</a>
         </div>
-    </div>
+    </nav>
 
-    <div id="dashboard-section" class="hidden relative z-10 min-h-screen flex flex-col">
-        
-        <nav class="bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-50">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex justify-between items-center h-16">
-                    <div class="flex items-center gap-3">
-                        <img src="https://i.ibb.co/svMHRcFF/Green-Modern-Badge-Gardening-Logo-Design-20260202-115512-0000.png" alt="Logo" class="h-8 w-8 rounded-full">
-                        <span class="font-bold text-lg text-slate-900">KindFund <span class="text-slate-400 font-medium">Admin</span></span>
-                    </div>
-                    <div class="flex items-center gap-4">
-                        <span class="text-sm font-bold text-slate-600 hidden md:block" id="admin-name">Admin</span>
-                        <button onclick="handleLogout()" class="text-sm bg-red-50 text-red-600 hover:bg-red-100 px-4 py-2 rounded-lg font-bold transition">
-                            <i class="fas fa-sign-out-alt mr-1"></i> Logout
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </nav>
-
-        <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+    <main class="flex-grow relative z-10 pt-32 pb-20 px-4">
+        <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10">
             
-            <div class="flex justify-between items-end mb-8">
-                <div>
-                    <h2 class="text-3xl font-extrabold text-slate-900">Donation Details</h2>
-                    <p class="text-slate-500 mt-1">Track and verify all incoming contributions.</p>
+            <div class="lg:col-span-7 space-y-8">
+                <span class="bg-green-100 text-primary border border-green-200 px-3 py-1 rounded-full text-xs font-bold uppercase"><i class="fas fa-check-circle"></i> Verified Cause</span>
+                
+                <h1 id="frontend-title" class="text-4xl md:text-5xl font-extrabold text-slate-900 leading-tight min-h-[48px] skeleton rounded-xl text-transparent">Loading Title...</h1>
+
+                <div class="relative rounded-3xl overflow-hidden shadow-xl bg-slate-200 h-[400px] skeleton" id="img-container">
+                    <img id="frontend-image" src="" class="w-full h-full object-cover opacity-0 transition-opacity duration-500">
                 </div>
-                <button onclick="alert('Exporting data to CSV...')" class="bg-white border border-slate-200 text-slate-700 px-4 py-2.5 rounded-xl font-bold text-sm hover:border-primary hover:text-primary transition shadow-sm">
-                    <i class="fas fa-download mr-1"></i> Export CSV
-                </button>
+
+                <div class="prose prose-slate max-w-none text-slate-600 bg-white/60 p-6 md:p-8 rounded-3xl border border-white">
+                    <h3 class="text-xl font-bold text-slate-900 mb-4">The Story</h3>
+                    <div id="frontend-desc" class="whitespace-pre-line skeleton min-h-[100px] rounded-xl text-transparent">Loading...</div>
+                </div>
             </div>
 
-            <div class="bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden">
-                
-                <div class="p-4 border-b border-slate-100 flex flex-wrap gap-4 justify-between bg-slate-50/50">
-                    <div class="relative w-full md:w-72">
-                        <i class="fas fa-search absolute left-3 top-3 text-slate-400"></i>
-                        <input type="text" placeholder="Search by name or email..." class="w-full pl-10 pr-4 py-2 text-sm bg-white border border-slate-200 rounded-lg focus:outline-none focus:border-primary">
-                    </div>
-                    <div class="flex gap-2">
-                        <select class="bg-white border border-slate-200 text-slate-700 text-sm rounded-lg focus:ring-primary focus:border-primary block p-2 font-medium">
-                            <option>All Campaigns</option>
-                            <option>Help Sarah Rebuild</option>
-                            <option>Assam Flood Relief</option>
-                        </select>
-                    </div>
+            <div class="lg:col-span-5 relative" id="donate-box">
+                <div class="sticky top-32 glass-card rounded-3xl p-8 shadow-2xl ring-1 ring-black/5">
+                    <h2 class="text-4xl font-extrabold text-primary mb-2">Contribute</h2>
+                    <p class="text-slate-500 text-sm mb-6">Every donation makes a direct impact.</p>
+                    
+                    <button id="donate-btn" class="w-full bg-slate-900 text-white py-4 rounded-xl font-bold text-lg shadow-xl opacity-50 cursor-not-allowed transition" disabled>
+                        <span id="donate-btn-text">Loading Details...</span>
+                    </button>
                 </div>
-
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
-                        <thead>
-                            <tr class="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider font-bold border-b border-slate-200">
-                                <th class="p-4">Transaction ID</th>
-                                <th class="p-4">Donor Info</th>
-                                <th class="p-4">Campaign</th>
-                                <th class="p-4">Date</th>
-                                <th class="p-4">Amount</th>
-                                <th class="p-4 text-center">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody class="text-sm divide-y divide-slate-100">
-                            <tr class="hover:bg-slate-50 transition">
-                                <td class="p-4 font-mono text-slate-500">#KF-8923</td>
-                                <td class="p-4">
-                                    <p class="font-bold text-slate-900">Rahul Sharma</p>
-                                    <p class="text-slate-500 text-xs">rahul.s@example.com</p>
-                                </td>
-                                <td class="p-4 font-medium text-slate-700">Help Sarah Rebuild</td>
-                                <td class="p-4 text-slate-500">Feb 22, 2026<br><span class="text-xs">10:45 AM</span></td>
-                                <td class="p-4 font-extrabold text-primary">₹5,000</td>
-                                <td class="p-4 text-center">
-                                    <span class="bg-green-100 text-green-700 px-2.5 py-1 rounded-full text-xs font-bold"><i class="fas fa-check-circle mr-1"></i> Success</span>
-                                </td>
-                            </tr>
-                            <tr class="hover:bg-slate-50 transition">
-                                <td class="p-4 font-mono text-slate-500">#KF-8922</td>
-                                <td class="p-4">
-                                    <p class="font-bold text-slate-900">Anonymous</p>
-                                    <p class="text-slate-500 text-xs">hidden@donor.com</p>
-                                </td>
-                                <td class="p-4 font-medium text-slate-700">Help Sarah Rebuild</td>
-                                <td class="p-4 text-slate-500">Feb 21, 2026<br><span class="text-xs">08:20 PM</span></td>
-                                <td class="p-4 font-extrabold text-primary">₹1,500</td>
-                                <td class="p-4 text-center">
-                                    <span class="bg-green-100 text-green-700 px-2.5 py-1 rounded-full text-xs font-bold"><i class="fas fa-check-circle mr-1"></i> Success</span>
-                                </td>
-                            </tr>
-                            <tr class="hover:bg-slate-50 transition">
-                                <td class="p-4 font-mono text-slate-500">#KF-8921</td>
-                                <td class="p-4">
-                                    <p class="font-bold text-slate-900">Priya Patel</p>
-                                    <p class="text-slate-500 text-xs">priya99@gmail.com</p>
-                                </td>
-                                <td class="p-4 font-medium text-slate-700">Assam Flood Relief</td>
-                                <td class="p-4 text-slate-500">Feb 21, 2026<br><span class="text-xs">04:12 PM</span></td>
-                                <td class="p-4 font-extrabold text-primary">₹10,000</td>
-                                <td class="p-4 text-center">
-                                    <span class="bg-yellow-100 text-yellow-700 px-2.5 py-1 rounded-full text-xs font-bold"><i class="fas fa-clock mr-1"></i> Pending</span>
-                                </td>
-                            </tr>
-                            <tr class="hover:bg-slate-50 transition">
-                                <td class="p-4 font-mono text-slate-500">#KF-8920</td>
-                                <td class="p-4">
-                                    <p class="font-bold text-slate-900">Amit Kumar</p>
-                                    <p class="text-slate-500 text-xs">amit.kumar@work.in</p>
-                                </td>
-                                <td class="p-4 font-medium text-slate-700">Help Sarah Rebuild</td>
-                                <td class="p-4 text-slate-500">Feb 20, 2026<br><span class="text-xs">11:30 AM</span></td>
-                                <td class="p-4 font-extrabold text-primary">₹2,000</td>
-                                <td class="p-4 text-center">
-                                    <span class="bg-red-100 text-red-700 px-2.5 py-1 rounded-full text-xs font-bold"><i class="fas fa-times-circle mr-1"></i> Failed</span>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                
-                <div class="p-4 border-t border-slate-100 flex items-center justify-between text-sm text-slate-500">
-                    <span>Showing 1 to 4 of 324 entries</span>
-                    <div class="flex gap-1">
-                        <button class="px-3 py-1 border border-slate-200 rounded hover:bg-slate-50 disabled:opacity-50" disabled>Prev</button>
-                        <button class="px-3 py-1 bg-primary text-white rounded">1</button>
-                        <button class="px-3 py-1 border border-slate-200 rounded hover:bg-slate-50">2</button>
-                        <button class="px-3 py-1 border border-slate-200 rounded hover:bg-slate-50">3</button>
-                        <button class="px-3 py-1 border border-slate-200 rounded hover:bg-slate-50">Next</button>
-                    </div>
-                </div>
-
             </div>
-        </main>
-    </div>
 
-    <script>
-        function handleLogin(event) {
-            event.preventDefault();
-            const email = document.getElementById('email').value;
-            
-            // Basic validation check (accepts anything for this UI demo)
-            if(email) {
-                document.getElementById('admin-name').innerText = email;
-                document.getElementById('login-section').classList.add('hidden');
-                document.getElementById('dashboard-section').classList.remove('hidden');
+        </div>
+    </main>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBunVS2o_nEvQNtcz68VwNCUGBS0Qufi7E",
+            authDomain: "kvadmin-a9a5d.firebaseapp.com",
+            projectId: "kvadmin-a9a5d",
+            storageBucket: "kvadmin-a9a5d.firebasestorage.app",
+            messagingSenderId: "1570940631",
+            appId: "1:1570940631:web:9b6bd8fe2a1c5a48653292"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        async function loadCampaignData() {
+            try {
+                const docSnap = await getDoc(doc(db, "campaigns", "active_campaign"));
+                
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+
+                    // Title
+                    const title = document.getElementById('frontend-title');
+                    title.innerText = data.title;
+                    title.classList.remove('skeleton', 'text-transparent');
+
+                    // Image
+                    const img = document.getElementById('frontend-image');
+                    document.getElementById('img-container').classList.remove('skeleton');
+                    img.src = data.image;
+                    img.onload = () => img.classList.remove('opacity-0');
+
+                    // Description
+                    const desc = document.getElementById('frontend-desc');
+                    desc.innerText = data.description;
+                    desc.classList.remove('skeleton', 'text-transparent');
+
+                    // CTA
+                    const btn = document.getElementById('donate-btn');
+                    document.getElementById('donate-btn-text').innerText = "Donate Now";
+                    btn.disabled = false;
+                    btn.classList.remove('opacity-50', 'cursor-not-allowed');
+                    btn.classList.add('hover:bg-primary', 'hover:-translate-y-1');
+
+                    btn.onclick = () => {
+                        alert(`Please send your contribution to UPI ID: \n\n${data.upi}`);
+                    };
+                } else {
+                    document.getElementById('frontend-title').innerText = "No Campaign Data Found";
+                    document.getElementById('frontend-title').classList.remove('skeleton', 'text-transparent');
+                }
+            } catch (error) {
+                console.error("Error fetching Firestore data:", error);
             }
         }
 
-        function handleLogout() {
-            document.getElementById('email').value = '';
-            document.getElementById('password').value = '';
-            document.getElementById('dashboard-section').classList.add('hidden');
-            document.getElementById('login-section').classList.remove('hidden');
-        }
+        loadCampaignData();
     </script>
 </body>
 </html>
