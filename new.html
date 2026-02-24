@@ -3,239 +3,118 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Help Sarah Rebuild - KindFund</title>
+    <title>Live Campaign - KindFund</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    colors: {
-                        primary: '#059669', // Emerald 600
-                        primaryDark: '#047857', // Emerald 700
-                        dark: '#0f172a',    // Slate 900
-                    },
-                    fontFamily: {
-                        sans: ['DM Sans', 'sans-serif'],
-                    },
+                    colors: { primary: '#059669', dark: '#0f172a' },
+                    fontFamily: { sans: ['DM Sans', 'sans-serif'] },
                     animation: {
                         'blob': 'blob 7s infinite',
                         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-                    },
-                    keyframes: {
-                        blob: {
-                            '0%': { transform: 'translate(0px, 0px) scale(1)' },
-                            '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
-                            '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
-                            '100%': { transform: 'translate(0px, 0px) scale(1)' },
-                        }
                     }
                 }
             }
         }
     </script>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
 
     <style>
         body { font-family: 'DM Sans', sans-serif; }
-        
-        .glass-card {
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-        }
-
-        .glass-nav {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-        }
-
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #f1f5f9; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-        
-        /* Loading skeleton animation */
-        .skeleton {
-            background: #e2e8f0;
-            background: linear-gradient(110deg, #ececec 8%, #f5f5f5 18%, #ececec 33%);
-            border-radius: 5px;
-            background-size: 200% 100%;
-            animation: 1.5s shine linear infinite;
-        }
-        @keyframes shine {
-            to { background-position-x: -200%; }
-        }
-
-        /* Hide number input arrows */
-        input[type="number"]::-webkit-outer-spin-button,
-        input[type="number"]::-webkit-inner-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
-        input[type="number"] {
-            -moz-appearance: textfield;
-        }
+        .glass-card { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.5); }
+        .glass-nav { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(0, 0, 0, 0.05); }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 antialiased overflow-x-hidden relative min-h-screen flex flex-col">
-
-    <div class="fixed inset-0 z-0 overflow-hidden pointer-events-none">
-        <div class="absolute top-0 left-1/4 w-96 h-96 bg-green-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
-        <div class="absolute top-0 right-1/4 w-96 h-96 bg-teal-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
-        <div class="absolute -bottom-32 left-1/3 w-96 h-96 bg-yellow-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-4000"></div>
-    </div>
+<body class="bg-slate-50 text-slate-800 antialiased relative min-h-screen flex flex-col">
 
     <nav id="navbar" class="fixed top-0 w-full z-50 transition-all duration-300 py-4 px-4 md:px-6">
-        <div class="max-w-7xl mx-auto flex justify-between items-center bg-white/60 backdrop-blur-md rounded-full px-6 py-3 border border-white/50 shadow-sm transition-all" id="nav-container">
+        <div class="max-w-7xl mx-auto flex justify-between items-center bg-white/60 backdrop-blur-md rounded-full px-6 py-3 shadow-sm border border-white/50" id="nav-container">
             <a href="index.html" class="flex items-center gap-3">
-                <img src="https://i.ibb.co/svMHRcFF/Green-Modern-Badge-Gardening-Logo-Design-20260202-115512-0000.png" alt="KindFund Logo" class="h-10 w-10 rounded-full shadow-sm bg-white p-0.5">
-                <span class="font-bold text-lg tracking-tight text-slate-900">Kind<span class="text-primary">Fund</span></span>
+                <img src="https://i.ibb.co/svMHRcFF/Green-Modern-Badge-Gardening-Logo-Design-20260202-115512-0000.png" alt="Logo" class="h-10 w-10 rounded-full bg-white p-0.5">
+                <span class="font-bold text-lg text-slate-900">Kind<span class="text-primary">Fund</span></span>
             </a>
             <div class="hidden md:flex gap-8 text-sm font-medium text-slate-600">
-                <a href="#active-campaigns" class="hover:text-primary transition">Campaigns</a>
-                <a href="#about" class="hover:text-primary transition">About Us</a>
+                <a href="index.html" class="hover:text-primary transition">Home</a>
+                <a href="#about" class="hover:text-primary transition">About</a>
             </div>
-            <a href="#donate-box" class="bg-slate-900 text-white px-6 py-2.5 rounded-full text-sm font-bold hover:bg-primary transition shadow-lg shadow-slate-900/20">
+            <button onclick="document.getElementById('donate-box').scrollIntoView({behavior: 'smooth'})" class="bg-slate-900 text-white px-6 py-2.5 rounded-full text-sm font-bold hover:bg-primary transition">
                 Donate Now
-            </a>
+            </button>
         </div>
     </nav>
 
     <main class="flex-grow relative z-10 pt-32 pb-20 px-4">
         <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-10">
-            
-            <div class="lg:col-span-7 space-y-8">
-                <div class="flex flex-wrap gap-3">
-                    <span class="bg-green-100 text-primary border border-green-200 px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide flex items-center gap-1.5">
-                        <i class="fas fa-check-circle"></i> Verified Cause
-                    </span>
+            <div class="lg:col-span-7 space-y-6">
+                <div class="flex gap-2">
+                    <span class="bg-green-100 text-primary px-3 py-1 rounded-full text-xs font-bold"><i class="fas fa-check-circle"></i> Verified Cause</span>
                 </div>
-
-                <h1 id="frontend-title" class="text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900 leading-tight min-h-[48px] skeleton text-transparent">Loading Campaign Title...</h1>
-
-                <div class="relative rounded-3xl overflow-hidden shadow-xl border border-white/50 bg-slate-200 skeleton h-[400px]" id="frontend-image-container">
-                    <img id="frontend-image" src="" alt="Campaign Image" class="w-full h-full object-cover opacity-0 transition-opacity duration-500">
-                    <div class="absolute bottom-4 left-4 right-4 bg-gradient-to-r from-red-500/90 to-orange-500/90 backdrop-blur-md rounded-xl p-4 text-white shadow-lg border border-white/20">
-                        <p class="font-bold flex items-center gap-2 text-sm md:text-base">
-                            <i class="fas fa-bolt text-yellow-300"></i> Urgent: Immediate Support Needed
-                        </p>
-                    </div>
-                </div>
-
-                <div class="prose prose-slate lg:prose-lg max-w-none text-slate-600 leading-relaxed bg-white/60 backdrop-blur-sm p-6 md:p-8 rounded-3xl border border-white min-h-[200px]">
+                <h1 id="camp-title" class="text-4xl md:text-5xl font-extrabold text-slate-900 leading-tight">Loading Campaign...</h1>
+                <img id="camp-img" src="https://images.unsplash.com/photo-1531123414780-f74242c2b052?q=80&w=1000&auto=format&fit=crop" class="w-full h-[400px] object-cover rounded-3xl shadow-lg bg-slate-200">
+                <div class="prose prose-slate text-slate-600 bg-white/60 p-6 md:p-8 rounded-3xl border border-white shadow-sm">
                     <h3 class="text-xl font-bold text-slate-900 mb-4">The Story</h3>
-                    <div id="frontend-desc" class="whitespace-pre-line skeleton min-h-[100px] text-transparent">Loading campaign description...</div>
+                    <p id="camp-desc" class="whitespace-pre-wrap">Fetching details from the database...</p>
                 </div>
             </div>
 
-            <div class="lg:col-span-5 relative">
-                <div class="sticky top-32" id="donate-box">
-                    <div class="glass-card rounded-3xl p-2 shadow-2xl ring-1 ring-black/5 relative overflow-hidden">
-                        <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-primary via-teal-400 to-primary"></div>
-                        <div class="bg-white/90 rounded-[1.3rem] p-6 md:p-8">
-                            
-                            <div class="mb-6">
-                                <div class="flex items-baseline gap-2 mb-2">
-                                    <h2 class="text-4xl font-extrabold text-primary">Contribute</h2>
-                                </div>
-                                <p class="text-slate-500 text-sm font-medium mb-4">Every donation makes a direct impact.</p>
-                            </div>
-
-                            <div class="mb-6 bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                                <label class="block text-sm font-bold text-slate-700 mb-3">Choose Donation Amount</label>
-                                
-                                <div class="grid grid-cols-3 gap-3 mb-4" id="preset-buttons">
-                                    <button type="button" class="preset-btn border border-slate-200 bg-white rounded-xl py-2.5 font-bold text-slate-600 hover:border-primary hover:text-primary transition" data-amount="500">₹500</button>
-                                    <button type="button" class="preset-btn border-2 border-primary bg-primary/5 rounded-xl py-2.5 font-bold text-primary transition" data-amount="1000">₹1000</button>
-                                    <button type="button" class="preset-btn border border-slate-200 bg-white rounded-xl py-2.5 font-bold text-slate-600 hover:border-primary hover:text-primary transition" data-amount="2000">₹2000</button>
-                                </div>
-
-                                <div class="relative">
-                                    <span class="absolute left-4 top-3 text-slate-400 font-bold text-lg">₹</span>
-                                    <input type="number" id="custom-amount" value="1000" min="1" class="w-full pl-9 pr-4 py-3 bg-white border border-slate-200 rounded-xl focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition font-extrabold text-slate-900 text-lg shadow-sm" placeholder="Enter custom amount">
-                                </div>
-                            </div>
-
-                            <div class="space-y-4" id="action-buttons-container">
-                                <button id="donate-btn" class="w-full bg-slate-900 text-white py-4 rounded-xl font-bold text-lg shadow-xl shadow-slate-900/20 transition transform hover:-translate-y-1 flex justify-center items-center gap-2 group opacity-50 cursor-not-allowed" disabled>
-                                    <span id="donate-btn-text">Loading...</span>
-                                    <i class="fas fa-heart text-red-500 animate-pulse-slow group-hover:scale-125 transition"></i>
-                                </button>
-                                
-                                <button onclick="navigator.share ? navigator.share({title: document.title, url: window.location.href}) : alert('Link copied!')" class="w-full bg-white border-2 border-slate-200 text-slate-700 py-3.5 rounded-xl font-bold text-base hover:border-primary hover:text-primary transition flex justify-center items-center gap-2">
-                                    <i class="fas fa-share-nodes"></i> Share Campaign
-                                </button>
-                            </div>
-
-                            <div class="mt-8 pt-6 border-t border-slate-100 flex flex-wrap justify-center gap-4 text-[11px] text-slate-400 font-semibold uppercase tracking-wider">
-                                <span class="flex items-center gap-1.5"><i class="fas fa-lock text-green-500"></i> Secure Payments</span>
-                                <span class="flex items-center gap-1.5"><i class="fas fa-shield-alt text-blue-500"></i> Full Refund Policy</span>
-                            </div>
-
+            <div class="lg:col-span-5 relative" id="donate-box">
+                <div class="sticky top-32 glass-card rounded-3xl p-8 shadow-xl">
+                    <div class="mb-6">
+                        <div class="flex items-baseline gap-2">
+                            <h2 id="camp-raised" class="text-4xl font-extrabold text-primary">₹0</h2>
+                            <span class="text-slate-500 text-sm">raised</span>
+                        </div>
+                        <p id="camp-goal" class="text-slate-400 text-sm mb-4">of ₹0 goal</p>
+                        <div class="w-full bg-slate-100 rounded-full h-3 mb-2 overflow-hidden">
+                            <div id="camp-progress" class="bg-primary h-3 rounded-full transition-all duration-1000" style="width: 0%"></div>
                         </div>
                     </div>
+
+                    <div class="mb-4 space-y-3">
+                        <input type="text" id="donorName" placeholder="Full Name *" required class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 font-medium focus:border-primary focus:outline-none">
+                        <input type="tel" id="donorPhone" placeholder="Phone Number *" required class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 font-medium focus:border-primary focus:outline-none">
+                    </div>
+
+                    <div class="mb-6">
+                        <label class="text-sm font-bold text-slate-700 block mb-2">Custom Amount (INR) *</label>
+                        <input type="number" id="donationAmount" value="1000" class="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-lg font-bold focus:border-primary focus:outline-none">
+                    </div>
+
+                    <button onclick="openRazorpay()" id="payBtn" class="w-full bg-slate-900 text-white py-4 rounded-xl font-bold text-lg hover:bg-primary transition shadow-lg flex justify-center items-center gap-2 group">
+                        <span>Donate via Razorpay</span>
+                        <i class="fas fa-heart text-red-500 animate-pulse-slow"></i>
+                    </button>
+                    
+                    <div class="mt-6 pt-6 border-t border-slate-100 flex justify-center gap-4 text-xs text-slate-400 font-semibold uppercase">
+                        <span><i class="fas fa-lock text-green-500"></i> Secure Payments</span>
+                    </div>
                 </div>
             </div>
-
         </div>
     </main>
 
-    <footer class="bg-white border-t border-slate-100 pt-16 pb-8 relative z-10 mt-auto">
-        <div class="max-w-7xl mx-auto px-4">
-            <div class="border-t border-slate-100 pt-8 text-center md:flex md:justify-between md:text-left">
-                <p class="text-slate-400 text-sm mb-4 md:mb-0">&copy; 2026 KindFund Foundation. Barpeta Road, Assam.</p>
-                <div class="flex justify-center md:justify-end gap-6 text-sm font-medium text-slate-400">
-                    <a href="#" class="hover:text-slate-900">Privacy Policy</a>
-                    <a href="#" class="hover:text-slate-900">Terms of Service</a>
-                </div>
+    <footer class="bg-white border-t border-slate-100 pt-10 pb-10">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <p class="text-slate-500 text-lg font-medium mb-6">&copy; 2026 KindFund Foundation. All rights reserved.</p>
+            <div class="flex flex-wrap justify-center gap-6 text-slate-400 font-medium text-lg mb-6">
+                <a href="index.html" class="hover:text-primary transition">Home</a>
+                <a href="privacy.html" class="hover:text-primary transition">Privacy Policy</a>
+                <a href="terms.html" class="hover:text-primary transition">Terms of Service</a>
             </div>
+            <a href="refunds.html" class="text-slate-900 font-bold text-lg hover:text-primary transition block">Refund Policy</a>
         </div>
     </footer>
 
     <script>
-        // Navbar Scroll
-        window.addEventListener('scroll', function() {
-            const navContainer = document.getElementById('nav-container');
-            if (window.scrollY > 20) {
-                navContainer.classList.add('glass-nav');
-                navContainer.classList.remove('bg-white/60', 'border-white/50');
-            } else {
-                navContainer.classList.remove('glass-nav');
-                navContainer.classList.add('bg-white/60', 'border-white/50');
-            }
-        });
-
-        // Amount Preset Buttons Logic
-        const presetBtns = document.querySelectorAll('.preset-btn');
-        const customAmountInput = document.getElementById('custom-amount');
-
-        presetBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                customAmountInput.value = btn.getAttribute('data-amount');
-                presetBtns.forEach(b => {
-                    b.className = "preset-btn border border-slate-200 bg-white rounded-xl py-2.5 font-bold text-slate-600 hover:border-primary hover:text-primary transition";
-                });
-                btn.className = "preset-btn border-2 border-primary bg-primary/5 rounded-xl py-2.5 font-bold text-primary transition";
-            });
-        });
-
-        customAmountInput.addEventListener('input', () => {
-            presetBtns.forEach(b => {
-                b.className = "preset-btn border border-slate-200 bg-white rounded-xl py-2.5 font-bold text-slate-600 hover:border-primary hover:text-primary transition";
-            });
-        });
-    </script>
-
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
+        // --- Firebase Initialization ---
         const firebaseConfig = {
             apiKey: "AIzaSyBunVS2o_nEvQNtcz68VwNCUGBS0Qufi7E",
             authDomain: "kvadmin-a9a5d.firebaseapp.com",
@@ -245,109 +124,113 @@
             appId: "1:1570940631:web:9b6bd8fe2a1c5a48653292",
             measurementId: "G-JZ660HR7QJ"
         };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+        // Navbar scroll effect
+        window.addEventListener('scroll', () => {
+            const nav = document.getElementById('nav-container');
+            window.scrollY > 20 ? nav.classList.add('glass-nav') : nav.classList.remove('glass-nav');
+        });
 
-        async function loadCampaignData() {
-            try {
-                const docRef = doc(db, "campaigns", "active_campaign");
-                const docSnap = await getDoc(docRef);
+        let activeCampaignTitle = "General Fund"; // Fallback
 
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
+        // --- Dynamic Campaign Loader ---
+        // Fetch the most recent campaign added via the admin panel
+        db.collection("campaigns").orderBy("timestamp", "desc").limit(1).onSnapshot((snapshot) => {
+            if (!snapshot.empty) {
+                const camp = snapshot.docs[0].data();
+                activeCampaignTitle = camp.title;
+                
+                document.getElementById('camp-title').innerText = camp.title;
+                document.getElementById('camp-img').src = camp.img;
+                document.getElementById('camp-desc').innerText = camp.desc;
+                document.getElementById('camp-goal').innerText = `of ₹${Number(camp.goalAmount).toLocaleString('en-IN')} goal`;
 
-                    // Update UI Elements
-                    document.getElementById('frontend-title').innerText = data.title || "Help Rebuild";
-                    document.getElementById('frontend-title').classList.remove('skeleton', 'text-transparent');
-                    document.title = `${data.title} - KindFund`;
-
-                    const imgEl = document.getElementById('frontend-image');
-                    if(data.image) {
-                        imgEl.src = data.image;
-                        imgEl.onload = () => {
-                            imgEl.classList.remove('opacity-0');
-                            document.getElementById('frontend-image-container').classList.remove('skeleton');
-                        };
+                // Fetch total donations for this specific campaign to calculate progress
+                db.collection("donations").where("campaign", "==", camp.title).onSnapshot((donSnapshot) => {
+                    let totalRaised = 0;
+                    donSnapshot.forEach(doc => {
+                        totalRaised += Number(doc.data().amount);
+                    });
+                    
+                    document.getElementById('camp-raised').innerText = `₹${totalRaised.toLocaleString('en-IN')}`;
+                    
+                    // Calculate Progress Bar Width
+                    let progressPercent = 0;
+                    if(camp.goalAmount > 0) {
+                        progressPercent = Math.min((totalRaised / camp.goalAmount) * 100, 100);
                     }
-
-                    document.getElementById('frontend-desc').innerText = data.description || "Story not available.";
-                    document.getElementById('frontend-desc').classList.remove('skeleton', 'text-transparent');
-
-                    const donateBtn = document.getElementById('donate-btn');
-                    document.getElementById('donate-btn-text').innerText = "Donate Now";
-                    donateBtn.disabled = false;
-                    donateBtn.classList.remove('opacity-50', 'cursor-not-allowed');
-                    donateBtn.classList.add('hover:bg-primary');
-
-                    // ==========================================
-                    // FIXED PAYMENT EXECUTION LOGIC
-                    // ==========================================
-                    donateBtn.onclick = () => {
-                        const amount = document.getElementById('custom-amount').value;
-                        
-                        if (!amount || amount <= 0) {
-                            alert("Please enter a valid donation amount.");
-                            return;
-                        }
-
-                        if(data.upi) {
-                            // Safely encode the parameters for the URL
-                            const upiID = data.upi;
-                            const campaignName = encodeURIComponent(data.title || "KindFund Campaign");
-                            const upiLink = `upi://pay?pa=${upiID}&pn=${campaignName}&am=${amount}&cu=INR`;
-
-                            // Detect if the user is on a mobile device
-                            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-
-                            if (isMobile) {
-                                // On Mobile: Open the UPI intent directly (GPay, PhonePe, etc.)
-                                window.location.href = upiLink;
-                            } else {
-                                // On Desktop: Display a scannable QR Code dynamically
-                                let qrDiv = document.getElementById('qr-display');
-                                
-                                if(!qrDiv) {
-                                    qrDiv = document.createElement('div');
-                                    qrDiv.id = 'qr-display';
-                                    qrDiv.className = 'mt-4 bg-slate-50 p-5 rounded-2xl border border-slate-200 text-center shadow-inner transition-all';
-                                    
-                                    // Inject it right below the action buttons
-                                    document.getElementById('action-buttons-container').appendChild(qrDiv);
-                                }
-                                
-                                // Free API to generate QR Code instantly
-                                const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiLink)}`;
-                                
-                                qrDiv.innerHTML = `
-                                    <p class="text-sm font-bold text-slate-800 mb-3">Scan to Pay via any UPI App</p>
-                                    <div class="bg-white p-2 rounded-xl inline-block shadow-sm border border-slate-100 mb-3">
-                                        <img src="${qrApiUrl}" class="w-40 h-40 object-contain" alt="UPI QR Code">
-                                    </div>
-                                    <div class="flex items-baseline justify-center gap-1">
-                                        <span class="text-lg font-bold text-slate-400">₹</span>
-                                        <span class="text-3xl font-extrabold text-primary">${amount}</span>
-                                    </div>
-                                    <p class="text-xs text-slate-500 font-mono mt-1 break-all">${upiID}</p>
-                                `;
-                            }
-                        } else {
-                            alert("Payment details are currently unavailable.");
-                        }
-                    };
-
-                } else {
-                    document.getElementById('frontend-title').innerText = "Campaign Not Found";
-                    document.getElementById('frontend-title').classList.remove('skeleton', 'text-transparent');
-                    document.getElementById('frontend-desc').classList.remove('skeleton', 'text-transparent');
-                    document.getElementById('frontend-desc').innerText = "Please update the campaign via the admin panel.";
-                }
-            } catch (error) {
-                console.error("Error fetching document:", error);
+                    document.getElementById('camp-progress').style.width = `${progressPercent}%`;
+                });
+            } else {
+                document.getElementById('camp-title').innerText = "No Active Campaigns";
+                document.getElementById('camp-desc').innerText = "Please check back later.";
             }
-        }
+        });
 
-        loadCampaignData();
+        // --- Razorpay & Firebase Integration ---
+        function openRazorpay() {
+            const name = document.getElementById('donorName').value.trim();
+            const phone = document.getElementById('donorPhone').value.trim();
+            const amount = document.getElementById('donationAmount').value;
+
+            if(!name || !phone || !amount || amount <= 0) {
+                alert("Please fill in your Name, Phone Number, and a valid Donation Amount.");
+                return;
+            }
+
+            let amountInPaise = amount * 100; 
+
+            var options = {
+                "key": "rzp_test_SIkLAdWQzf9tHw", 
+                "amount": amountInPaise,
+                "currency": "INR",
+                "name": "KindFund Foundation",
+                "description": `Donation for ${activeCampaignTitle}`,
+                "image": "https://i.ibb.co/svMHRcFF/Green-Modern-Badge-Gardening-Logo-Design-20260202-115512-0000.png",
+                "handler": function (response) {
+                    
+                    const btn = document.getElementById('payBtn');
+                    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+                    
+                    // Save to Firebase
+                    db.collection('donations').add({
+                        name: name,
+                        phone: phone,
+                        amount: Number(amount),
+                        method: 'Online (Razorpay)',
+                        paymentId: response.razorpay_payment_id,
+                        campaign: activeCampaignTitle, // Links to the dynamic campaign
+                        date: new Date().toISOString().split('T')[0],
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                    }).then(() => {
+                        alert(`Thank you ${name}! Your payment of ₹${amount} was successful.\nPayment ID: ${response.razorpay_payment_id}`);
+                        document.getElementById('donorName').value = '';
+                        document.getElementById('donorPhone').value = '';
+                        btn.innerHTML = '<span>Donate via Razorpay</span><i class="fas fa-heart text-red-500 animate-pulse-slow"></i>';
+                    }).catch((error) => {
+                        console.error("Error saving donation: ", error);
+                        alert("Payment successful, but error recording it. Contact support.");
+                        btn.innerHTML = '<span>Donate via Razorpay</span><i class="fas fa-heart text-red-500 animate-pulse-slow"></i>';
+                    });
+                },
+                "prefill": {
+                    "name": name,
+                    "contact": phone
+                },
+                "theme": {
+                    "color": "#059669"
+                }
+            };
+            var rzp1 = new Razorpay(options);
+            
+            rzp1.on('payment.failed', function (response){
+                alert("Payment Failed: " + response.error.description);
+            });
+            
+            rzp1.open();
+        }
     </script>
 </body>
 </html>
