@@ -43,10 +43,9 @@
         .hide-scroll::-webkit-scrollbar { display: none; }
     </style>
 </head>
-<body class="h-screen overflow-hidden text-slate-800 flex relative">
+<body class="h-screen overflow-hidden text-slate-800 flex relative w-full">
 
     <div id="loginScreen" class="fixed inset-0 bg-slate-50 z-50 flex items-center justify-center transition-opacity duration-500">
-        
         <div class="fixed inset-0 z-0 overflow-hidden pointer-events-none">
             <div class="absolute top-0 left-1/4 w-96 h-96 bg-green-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
             <div class="absolute top-0 right-1/4 w-96 h-96 bg-teal-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob" style="animation-delay: 2s;"></div>
@@ -89,10 +88,15 @@
 
     <div id="appLayout" class="flex w-full h-full hidden opacity-0 transition-opacity duration-500 relative z-20">
         
-        <aside class="w-64 bg-slate-900 text-white flex flex-col hidden md:flex shrink-0">
-            <div class="p-6 flex items-center gap-3 border-b border-slate-800">
-                <img src="https://i.ibb.co/svMHRcFF/Green-Modern-Badge-Gardening-Logo-Design-20260202-115512-0000.png" class="h-8 w-8 rounded-full bg-white p-0.5">
-                <span class="font-bold text-xl tracking-tight">KindFund <span class="text-emerald-500">Admin</span></span>
+        <div id="sidebarBackdrop" onclick="toggleSidebar()" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-30 hidden md:hidden transition-opacity"></div>
+
+        <aside id="sidebar" class="w-64 bg-slate-900 text-white flex-col flex absolute md:relative z-40 h-full transform -translate-x-full md:translate-x-0 transition-transform duration-300 shrink-0">
+            <div class="p-6 flex items-center justify-between border-b border-slate-800">
+                <div class="flex items-center gap-3">
+                    <img src="https://i.ibb.co/svMHRcFF/Green-Modern-Badge-Gardening-Logo-Design-20260202-115512-0000.png" class="h-8 w-8 rounded-full bg-white p-0.5">
+                    <span class="font-bold text-xl tracking-tight">Admin</span>
+                </div>
+                <button onclick="toggleSidebar()" class="md:hidden text-slate-400 hover:text-white"><i class="fas fa-times text-xl"></i></button>
             </div>
             <nav class="flex-1 p-4 space-y-2">
                 <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn w-full flex items-center gap-3 bg-emerald-600 text-white px-4 py-3 rounded-lg font-medium transition"><i class="fas fa-home w-5"></i> Dashboard</button>
@@ -106,52 +110,59 @@
             </div>
         </aside>
 
-        <main class="flex-1 flex flex-col overflow-y-auto hide-scroll">
-            <header class="bg-white shadow-sm px-8 py-4 flex justify-between items-center sticky top-0 z-10">
-                <h1 id="pageTitle" class="text-2xl font-bold text-slate-800">Overview Dashboard</h1>
+        <main class="flex-1 flex flex-col overflow-y-auto hide-scroll w-full">
+            
+            <header class="bg-white shadow-sm px-4 md:px-8 py-4 flex justify-between items-center sticky top-0 z-10 w-full">
                 <div class="flex items-center gap-4">
-                    <span class="text-sm font-medium text-slate-500" id="adminUserEmail">Admin</span>
-                    <div class="h-10 w-10 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-600 font-bold">
+                    <button onclick="toggleSidebar()" class="md:hidden text-slate-600 hover:text-emerald-600 transition text-xl">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1 id="pageTitle" class="text-xl md:text-2xl font-bold text-slate-800 hidden sm:block">Overview Dashboard</h1>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span class="text-xs md:text-sm font-medium text-slate-500 truncate max-w-[120px] md:max-w-none" id="adminUserEmail">Admin</span>
+                    <div class="h-8 w-8 md:h-10 md:w-10 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-600 font-bold text-sm md:text-base">
                         <i class="fas fa-user-shield"></i>
                     </div>
                 </div>
             </header>
 
-            <div class="p-8">
-                <div id="tab-dashboard" class="tab-content space-y-8">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4">
-                            <div class="h-14 w-14 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-2xl"><i class="fas fa-wallet"></i></div>
+            <div class="p-4 md:p-8 w-full max-w-7xl mx-auto">
+                
+                <div id="tab-dashboard" class="tab-content space-y-6 md:space-y-8">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+                        <div class="bg-white p-5 md:p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4">
+                            <div class="h-12 w-12 md:h-14 md:w-14 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-xl md:text-2xl"><i class="fas fa-wallet"></i></div>
                             <div>
-                                <p class="text-slate-400 text-sm font-bold uppercase tracking-wide">Total Raised</p>
-                                <p class="text-3xl font-extrabold text-slate-900" id="stat-raised">₹0</p>
+                                <p class="text-slate-400 text-xs md:text-sm font-bold uppercase tracking-wide">Total Raised</p>
+                                <p class="text-2xl md:text-3xl font-extrabold text-slate-900" id="stat-raised">₹0</p>
                             </div>
                         </div>
-                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4">
-                            <div class="h-14 w-14 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center text-2xl"><i class="fas fa-users"></i></div>
+                        <div class="bg-white p-5 md:p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4">
+                            <div class="h-12 w-12 md:h-14 md:w-14 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center text-xl md:text-2xl"><i class="fas fa-users"></i></div>
                             <div>
-                                <p class="text-slate-400 text-sm font-bold uppercase tracking-wide">Total Donors</p>
-                                <p class="text-3xl font-extrabold text-slate-900" id="stat-donors">0</p>
+                                <p class="text-slate-400 text-xs md:text-sm font-bold uppercase tracking-wide">Total Donors</p>
+                                <p class="text-2xl md:text-3xl font-extrabold text-slate-900" id="stat-donors">0</p>
                             </div>
                         </div>
-                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4">
-                            <div class="h-14 w-14 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center text-2xl"><i class="fas fa-bullhorn"></i></div>
+                        <div class="bg-white p-5 md:p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center gap-4">
+                            <div class="h-12 w-12 md:h-14 md:w-14 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center text-xl md:text-2xl"><i class="fas fa-bullhorn"></i></div>
                             <div>
-                                <p class="text-slate-400 text-sm font-bold uppercase tracking-wide">Active Campaigns</p>
-                                <p class="text-3xl font-extrabold text-slate-900" id="stat-campaigns">0</p>
+                                <p class="text-slate-400 text-xs md:text-sm font-bold uppercase tracking-wide">Active Campaigns</p>
+                                <p class="text-2xl md:text-3xl font-extrabold text-slate-900" id="stat-campaigns">0</p>
                             </div>
                         </div>
                     </div>
                     
-                    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-                        <div class="p-6 border-b border-slate-100"><h2 class="text-lg font-bold text-slate-900">Recent Transactions Overview</h2></div>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left border-collapse">
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden w-full">
+                        <div class="p-4 md:p-6 border-b border-slate-100"><h2 class="text-lg font-bold text-slate-900">Recent Transactions</h2></div>
+                        <div class="overflow-x-auto w-full">
+                            <table class="w-full text-left border-collapse min-w-[500px]">
                                 <thead>
                                     <tr class="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider">
-                                        <th class="p-4 font-semibold">Date</th>
-                                        <th class="p-4 font-semibold">Donor Name</th>
-                                        <th class="p-4 font-semibold">Amount</th>
+                                        <th class="p-4 font-semibold whitespace-nowrap">Date</th>
+                                        <th class="p-4 font-semibold whitespace-nowrap">Donor Name</th>
+                                        <th class="p-4 font-semibold whitespace-nowrap text-right">Amount</th>
                                     </tr>
                                 </thead>
                                 <tbody class="text-sm divide-y divide-slate-50" id="recentActivityRows">
@@ -165,41 +176,47 @@
                     </div>
                 </div>
 
-                <div id="tab-campaigns" class="tab-content hidden space-y-6">
-                    <div class="flex justify-between items-center">
-                        <h2 class="text-xl font-bold text-slate-800">Manage Live Campaigns</h2>
-                        <button onclick="openCampaignModal()" class="bg-emerald-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-emerald-700 transition flex items-center gap-2 shadow-sm">
+                <div id="tab-campaigns" class="tab-content hidden space-y-4 md:space-y-6">
+                    <div class="flex flex-wrap justify-between items-center gap-4">
+                        <h2 class="text-lg md:text-xl font-bold text-slate-800">Manage Live Campaigns</h2>
+                        <button onclick="openCampaignModal()" class="bg-emerald-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-emerald-700 transition flex items-center gap-2 shadow-sm text-sm md:text-base w-full sm:w-auto justify-center">
                             <i class="fas fa-plus"></i> Add Campaign
                         </button>
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="campaignList"></div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6" id="campaignList"></div>
                 </div>
 
-                <div id="tab-donations" class="tab-content hidden space-y-6">
-                    <div class="flex flex-wrap justify-between items-center gap-4 bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
-                        <div class="flex gap-3">
-                            <button onclick="openCashModal()" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-blue-700 transition shadow-sm flex items-center gap-2">
-                                <i class="fas fa-money-bill-wave"></i> Add Cash Donation
+                <div id="tab-donations" class="tab-content hidden space-y-4 md:space-y-6">
+                    <div class="flex flex-col lg:flex-row justify-between items-stretch lg:items-center gap-4 bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
+                        <div class="flex flex-wrap gap-2">
+                            <button onclick="openCashModal()" class="bg-blue-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-blue-700 transition shadow-sm flex items-center justify-center gap-2 text-sm">
+                                <i class="fas fa-money-bill-wave"></i> Add Cash
                             </button>
-                            <button onclick="downloadPDF()" class="bg-slate-900 text-white px-4 py-2 rounded-lg font-bold hover:bg-slate-800 transition shadow-sm flex items-center gap-2">
+                            <button onclick="downloadPDF()" class="bg-slate-900 text-white px-4 py-2 rounded-lg font-bold hover:bg-slate-800 transition shadow-sm flex items-center justify-center gap-2 text-sm">
                                 <i class="fas fa-file-pdf"></i> Download PDF
                             </button>
+                            <button onclick="clearDonations()" class="bg-red-50 text-red-600 border border-red-200 px-4 py-2 rounded-lg font-bold hover:bg-red-600 hover:text-white transition flex items-center justify-center gap-2 text-sm">
+                                <i class="fas fa-trash-alt"></i> Clear Data
+                            </button>
                         </div>
-                        <button onclick="clearDonations()" class="bg-red-50 text-red-600 border border-red-200 px-4 py-2 rounded-lg font-bold hover:bg-red-600 hover:text-white transition flex items-center gap-2">
-                            <i class="fas fa-trash-alt"></i> Clear All History
-                        </button>
+                        
+                        <div class="relative w-full sm:max-w-xs">
+                            <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                            <input type="text" id="searchPhone" oninput="filterDonations()" placeholder="Search by phone number..." class="w-full bg-slate-50 border border-slate-200 rounded-lg pl-10 pr-4 py-2 text-sm focus:border-emerald-500 focus:outline-none transition">
+                        </div>
                     </div>
 
-                    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left border-collapse">
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden w-full">
+                        <div class="overflow-x-auto w-full">
+                            <table class="w-full text-left border-collapse min-w-[800px]">
                                 <thead>
                                     <tr class="bg-slate-50 text-slate-500 text-xs uppercase tracking-wider">
-                                        <th class="p-4 font-semibold">Date</th>
-                                        <th class="p-4 font-semibold">Donor Name</th>
-                                        <th class="p-4 font-semibold">Campaign</th>
-                                        <th class="p-4 font-semibold">Method</th>
-                                        <th class="p-4 font-semibold text-right">Amount (₹)</th>
+                                        <th class="p-4 font-semibold whitespace-nowrap">Date</th>
+                                        <th class="p-4 font-semibold whitespace-nowrap">Donor Name</th>
+                                        <th class="p-4 font-semibold whitespace-nowrap">Phone Number</th>
+                                        <th class="p-4 font-semibold whitespace-nowrap">Campaign</th>
+                                        <th class="p-4 font-semibold whitespace-nowrap">Method</th>
+                                        <th class="p-4 font-semibold whitespace-nowrap text-right">Amount (₹)</th>
                                     </tr>
                                 </thead>
                                 <tbody class="text-sm divide-y divide-slate-50" id="donationRows"></tbody>
@@ -211,9 +228,9 @@
         </main>
     </div>
 
-    <div id="campaignModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center hidden">
-        <div class="bg-white p-6 md:p-8 rounded-3xl shadow-2xl w-full max-w-lg mx-4">
-            <h2 id="campaignModalTitle" class="text-2xl font-bold text-slate-900 mb-6">Add/Edit Campaign</h2>
+    <div id="campaignModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white p-6 md:p-8 rounded-3xl shadow-2xl w-full max-w-lg overflow-y-auto max-h-[90vh]">
+            <h2 id="campaignModalTitle" class="text-xl md:text-2xl font-bold text-slate-900 mb-6">Add/Edit Campaign</h2>
             <form id="campaignForm" class="space-y-4">
                 <input type="hidden" id="campId">
                 <div>
@@ -233,20 +250,24 @@
                     <textarea id="campDesc" rows="4" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium focus:border-emerald-500 focus:outline-none resize-none"></textarea>
                 </div>
                 <div class="flex gap-3 pt-4 border-t border-slate-100">
-                    <button type="button" onclick="closeModals()" class="flex-1 bg-slate-100 text-slate-600 py-3.5 rounded-xl font-bold hover:bg-slate-200 transition">Cancel</button>
-                    <button type="submit" class="flex-1 bg-emerald-600 text-white py-3.5 rounded-xl font-bold hover:bg-emerald-700 transition shadow-lg shadow-emerald-600/20">Save to Live Site</button>
+                    <button type="button" onclick="closeModals()" class="flex-1 bg-slate-100 text-slate-600 py-3 rounded-xl font-bold hover:bg-slate-200 transition text-sm md:text-base">Cancel</button>
+                    <button type="submit" class="flex-1 bg-emerald-600 text-white py-3 rounded-xl font-bold hover:bg-emerald-700 transition shadow-lg shadow-emerald-600/20 text-sm md:text-base">Save</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <div id="cashModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center hidden">
-        <div class="bg-white p-6 md:p-8 rounded-3xl shadow-2xl w-full max-w-md mx-4">
-            <h2 class="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-2"><i class="fas fa-money-bill-wave text-blue-600"></i> Add Cash Donation</h2>
+    <div id="cashModal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white p-6 md:p-8 rounded-3xl shadow-2xl w-full max-w-md">
+            <h2 class="text-xl md:text-2xl font-bold text-slate-900 mb-6 flex items-center gap-2"><i class="fas fa-money-bill-wave text-blue-600"></i> Add Cash Donation</h2>
             <form id="cashForm" class="space-y-4">
                 <div>
                     <label class="block text-sm font-bold text-slate-700 mb-1">Donor Full Name</label>
                     <input type="text" id="cashName" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium focus:border-blue-500 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-slate-700 mb-1">Phone Number</label>
+                    <input type="tel" id="cashPhone" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium focus:border-blue-500 focus:outline-none" placeholder="Optional">
                 </div>
                 <div>
                     <label class="block text-sm font-bold text-slate-700 mb-1">Assign to Campaign</label>
@@ -259,14 +280,22 @@
                     <input type="number" id="cashAmount" required class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm font-medium focus:border-blue-500 focus:outline-none" placeholder="e.g. 500">
                 </div>
                 <div class="flex gap-3 pt-4 border-t border-slate-100">
-                    <button type="button" onclick="closeModals()" class="flex-1 bg-slate-100 text-slate-600 py-3.5 rounded-xl font-bold hover:bg-slate-200 transition">Cancel</button>
-                    <button type="submit" class="flex-1 bg-blue-600 text-white py-3.5 rounded-xl font-bold hover:bg-blue-700 transition shadow-lg shadow-blue-600/20">Log Entry</button>
+                    <button type="button" onclick="closeModals()" class="flex-1 bg-slate-100 text-slate-600 py-3 rounded-xl font-bold hover:bg-slate-200 transition text-sm md:text-base">Cancel</button>
+                    <button type="submit" class="flex-1 bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 transition shadow-lg shadow-blue-600/20 text-sm md:text-base">Log Entry</button>
                 </div>
             </form>
         </div>
     </div>
 
     <script>
+        // --- Sidebar Mobile Toggle ---
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('sidebarBackdrop');
+            sidebar.classList.toggle('-translate-x-full');
+            backdrop.classList.toggle('hidden');
+        }
+
         // --- 1. FIREBASE CONFIG ---
         const firebaseConfig = {
             apiKey: "AIzaSyBunVS2o_nEvQNtcz68VwNCUGBS0Qufi7E",
@@ -350,6 +379,11 @@
             
             const titles = { 'dashboard': 'Overview Dashboard', 'campaigns': 'Campaign Management', 'donations': 'Donation Records' };
             document.getElementById('pageTitle').innerText = titles[tabId];
+
+            if (window.innerWidth < 768) {
+                document.getElementById('sidebar').classList.add('-translate-x-full');
+                document.getElementById('sidebarBackdrop').classList.add('hidden');
+            }
         }
 
         // --- 4. FIREBASE DATA ---
@@ -368,14 +402,14 @@
                     
                     list.innerHTML += `
                         <div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-100 flex flex-col hover:shadow-lg transition">
-                            <img src="${c.img}" class="h-48 w-full object-cover">
-                            <div class="p-5 flex-1 flex flex-col">
+                            <img src="${c.img}" class="h-40 sm:h-48 w-full object-cover">
+                            <div class="p-4 sm:p-5 flex-1 flex flex-col">
                                 <span class="bg-green-100 text-primary w-fit px-2 py-1 rounded text-[10px] font-bold uppercase mb-2">Goal: ₹${Number(c.goalAmount).toLocaleString('en-IN')}</span>
-                                <h3 class="font-bold text-lg text-slate-900 mb-2">${c.title}</h3>
-                                <p class="text-sm text-slate-500 mb-4 flex-1 line-clamp-2 leading-relaxed">${c.desc}</p>
+                                <h3 class="font-bold text-base sm:text-lg text-slate-900 mb-2 leading-tight">${c.title}</h3>
+                                <p class="text-xs sm:text-sm text-slate-500 mb-4 flex-1 line-clamp-2 leading-relaxed">${c.desc}</p>
                                 <div class="flex gap-2 border-t border-slate-100 pt-4">
-                                    <button onclick="openCampaignModal('${c.id}')" class="flex-1 bg-slate-50 text-slate-700 py-2.5 rounded-xl text-sm font-bold hover:bg-emerald-100 hover:text-emerald-700 transition">Edit</button>
-                                    <button onclick="deleteCampaign('${c.id}')" class="flex-1 bg-red-50 text-red-600 py-2.5 rounded-xl text-sm font-bold hover:bg-red-600 hover:text-white transition">Delete</button>
+                                    <button onclick="openCampaignModal('${c.id}')" class="flex-1 bg-slate-50 text-slate-700 py-2 rounded-xl text-xs sm:text-sm font-bold hover:bg-emerald-100 hover:text-emerald-700 transition">Edit</button>
+                                    <button onclick="deleteCampaign('${c.id}')" class="flex-1 bg-red-50 text-red-600 py-2 rounded-xl text-xs sm:text-sm font-bold hover:bg-red-600 hover:text-white transition">Delete</button>
                                 </div>
                             </div>
                         </div>
@@ -387,14 +421,11 @@
 
             unsubscribeDonations = db.collection("donations").orderBy("timestamp", "desc").onSnapshot((snapshot) => {
                 currentDonations = [];
-                const tbody = document.getElementById('donationRows');
                 const recentBody = document.getElementById('recentActivityRows');
-                
-                tbody.innerHTML = ''; recentBody.innerHTML = '';
+                recentBody.innerHTML = '';
                 let total = 0; let count = 0;
 
                 if(snapshot.empty) {
-                    tbody.innerHTML = '<tr><td colspan="5" class="p-8 text-center text-slate-400 font-medium">No donations found yet.</td></tr>';
                     recentBody.innerHTML = '<tr><td colspan="3" class="p-6 text-center text-slate-400 font-medium">No recent activity.</td></tr>';
                 }
 
@@ -404,24 +435,12 @@
                     currentDonations.push(d);
                     total += Number(d.amount);
 
-                    const badgeClass = String(d.method).includes('Cash') ? 'bg-orange-100 text-orange-700 border border-orange-200' : 'bg-emerald-100 text-emerald-700 border border-emerald-200';
-                    
-                    tbody.innerHTML += `
-                        <tr class="hover:bg-slate-50 transition">
-                            <td class="p-4 text-slate-500 font-medium">${d.date}</td>
-                            <td class="p-4 font-bold text-slate-800">${d.name}</td>
-                            <td class="p-4 text-slate-600 font-medium">${d.campaign}</td>
-                            <td class="p-4"><span class="${badgeClass} px-2.5 py-1 rounded text-[10px] font-bold uppercase tracking-wider">${d.method}</span></td>
-                            <td class="p-4 font-extrabold text-emerald-600 text-right">₹${Number(d.amount).toLocaleString('en-IN')}</td>
-                        </tr>
-                    `;
-
                     if(count < 4) {
                         recentBody.innerHTML += `
                             <tr class="border-b border-slate-50">
-                                <td class="p-4 text-slate-500 text-xs">${d.date}</td>
-                                <td class="p-4 font-bold text-slate-800 text-sm">${d.name}</td>
-                                <td class="p-4 font-bold text-emerald-600 text-sm">₹${Number(d.amount).toLocaleString('en-IN')}</td>
+                                <td class="p-3 sm:p-4 text-slate-500 text-xs sm:text-sm whitespace-nowrap">${d.date}</td>
+                                <td class="p-3 sm:p-4 font-bold text-slate-800 text-sm whitespace-nowrap">${d.name}</td>
+                                <td class="p-3 sm:p-4 font-bold text-emerald-600 text-sm text-right whitespace-nowrap">₹${Number(d.amount).toLocaleString('en-IN')}</td>
                             </tr>
                         `;
                     }
@@ -430,7 +449,45 @@
 
                 document.getElementById('stat-raised').innerText = `₹${total.toLocaleString('en-IN')}`;
                 document.getElementById('stat-donors').innerText = currentDonations.length;
+                
+                filterDonations(); // Automatically renders the table based on search status
             });
+        }
+
+        // --- NEW: RENDER DONATIONS TABLE DYNAMICALLY ---
+        function renderDonationsTable(dataArray) {
+            const tbody = document.getElementById('donationRows');
+            tbody.innerHTML = '';
+            
+            if(dataArray.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="p-8 text-center text-slate-400 font-medium">No donations found.</td></tr>';
+                return;
+            }
+
+            dataArray.forEach(d => {
+                const badgeClass = String(d.method).includes('Cash') ? 'bg-orange-100 text-orange-700 border border-orange-200' : 'bg-emerald-100 text-emerald-700 border border-emerald-200';
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50 transition">
+                        <td class="p-3 sm:p-4 text-slate-500 font-medium whitespace-nowrap">${d.date}</td>
+                        <td class="p-3 sm:p-4 font-bold text-slate-800 whitespace-nowrap">${d.name}</td>
+                        <td class="p-3 sm:p-4 text-slate-600 font-medium whitespace-nowrap">${d.phone || 'N/A'}</td>
+                        <td class="p-3 sm:p-4 text-slate-600 font-medium whitespace-nowrap">${d.campaign}</td>
+                        <td class="p-3 sm:p-4 whitespace-nowrap"><span class="${badgeClass} px-2.5 py-1 rounded text-[10px] font-bold uppercase tracking-wider">${d.method}</span></td>
+                        <td class="p-3 sm:p-4 font-extrabold text-emerald-600 text-right whitespace-nowrap">₹${Number(d.amount).toLocaleString('en-IN')}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        // --- NEW: SEARCH BAR FILTER LOGIC ---
+        function filterDonations() {
+            const query = document.getElementById('searchPhone').value.trim().toLowerCase();
+            if (query === '') {
+                renderDonationsTable(currentDonations);
+            } else {
+                const filtered = currentDonations.filter(d => (d.phone && d.phone.toLowerCase().includes(query)));
+                renderDonationsTable(filtered);
+            }
         }
 
         // --- 5. CAMPAIGNS CRUD ---
@@ -456,7 +513,7 @@
             const id = document.getElementById('campId').value;
             const data = {
                 title: document.getElementById('campTitle').value,
-                goalAmount: Number(document.getElementById('campGoal').value), // Added goal amount
+                goalAmount: Number(document.getElementById('campGoal').value), 
                 img: document.getElementById('campImage').value,
                 desc: document.getElementById('campDesc').value,
                 timestamp: firebase.firestore.FieldValue.serverTimestamp()
@@ -481,6 +538,7 @@
             e.preventDefault();
             db.collection("donations").add({
                 name: document.getElementById('cashName').value,
+                phone: document.getElementById('cashPhone').value || 'N/A', // Captures offline phone
                 campaign: document.getElementById('cashCampaign').value,
                 method: 'Offline (Cash)',
                 amount: Number(document.getElementById('cashAmount').value),
@@ -498,15 +556,27 @@
             }
         }
 
-        // --- 7. PDF ---
+        // --- 7. PDF GENERATION UPDATED ---
         function downloadPDF() {
             if(currentDonations.length === 0) return alert("No donations to export.");
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
             doc.setFontSize(18); doc.text("KindFund - Complete Donation History", 14, 22);
             doc.setFontSize(10); doc.setTextColor(100); doc.text(`Generated securely by Admin on: ${new Date().toLocaleString()}`, 14, 30);
-            const tableData = currentDonations.map(d => [d.date, d.name, d.campaign, d.method, `Rs. ${Number(d.amount).toLocaleString('en-IN')}`]);
-            doc.autoTable({ startY: 36, head: [['Date', 'Donor Name', 'Campaign', 'Method', 'Amount']], body: tableData, theme: 'grid', headStyles: { fillColor: [5, 150, 105] }, styles: { font: 'helvetica', fontSize: 9 } });
+            
+            // Added Phone to PDF array
+            const tableData = currentDonations.map(d => [d.date, d.name, d.phone || 'N/A', d.campaign, d.method, `Rs. ${Number(d.amount).toLocaleString('en-IN')}`]);
+            
+            // Added Phone Header to PDF Table
+            doc.autoTable({ 
+                startY: 36, 
+                head: [['Date', 'Donor Name', 'Phone', 'Campaign', 'Method', 'Amount']], 
+                body: tableData, 
+                theme: 'grid', 
+                headStyles: { fillColor: [5, 150, 105] }, 
+                styles: { font: 'helvetica', fontSize: 9 } 
+            });
+            
             doc.save(`KindFund_Donations_${new Date().toISOString().split('T')[0]}.pdf`);
         }
 
