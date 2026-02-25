@@ -26,6 +26,7 @@
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
     <style>
         body { font-family: 'DM Sans', sans-serif; }
@@ -33,9 +34,9 @@
         .glass-nav { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(0, 0, 0, 0.05); }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 antialiased relative min-h-screen flex flex-col">
+<body class="bg-slate-50 text-slate-800 antialiased relative min-h-screen flex flex-col overflow-x-hidden">
 
-    <nav id="navbar" class="fixed top-0 w-full z-50 transition-all duration-300 py-4 px-4 md:px-6">
+    <nav id="navbar" class="fixed top-0 w-full z-40 transition-all duration-300 py-4 px-4 md:px-6">
         <div class="max-w-7xl mx-auto flex justify-between items-center bg-white/60 backdrop-blur-md rounded-full px-6 py-3 shadow-sm border border-white/50" id="nav-container">
             <a href="index.html" class="flex items-center gap-3">
                 <img src="https://i.ibb.co/svMHRcFF/Green-Modern-Badge-Gardening-Logo-Design-20260202-115512-0000.png" alt="Logo" class="h-10 w-10 rounded-full bg-white p-0.5">
@@ -81,7 +82,7 @@
             </div>
 
             <div class="lg:col-span-5 relative" id="donate-box">
-                <div class="sticky top-32 glass-card rounded-3xl p-8 shadow-xl">
+                <div class="sticky top-32 glass-card rounded-3xl p-6 md:p-8 shadow-xl">
                     <div class="mb-6">
                         <div class="flex items-baseline gap-2">
                             <h2 id="camp-raised" class="text-4xl font-extrabold text-primary">₹0</h2>
@@ -122,6 +123,37 @@
         </div>
     </main>
 
+    <div id="successModal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center hidden">
+        <div class="bg-white p-6 md:p-8 rounded-[2rem] shadow-2xl w-full max-w-md mx-4 text-center transform scale-95 transition-transform duration-300" id="successModalContent">
+            <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center text-green-500 text-4xl mx-auto mb-6 shadow-inner">
+                <i class="fas fa-check"></i>
+            </div>
+            <h2 class="text-3xl font-bold text-slate-900 mb-2">Payment Successful!</h2>
+            <p class="text-slate-600 mb-6" id="successMessage">Thank you for your generosity.</p>
+            
+            <div class="bg-slate-50 border border-slate-100 rounded-2xl p-5 mb-6 text-left shadow-inner">
+                <p class="text-xs font-bold text-slate-400 uppercase tracking-wide mb-3 border-b border-slate-200 pb-2">Transaction Details</p>
+                <div class="space-y-2 text-sm">
+                    <div class="flex justify-between"><span class="text-slate-500">Receipt ID:</span> <span id="receiptId" class="font-mono font-bold text-slate-800"></span></div>
+                    <div class="flex justify-between"><span class="text-slate-500">Donor Name:</span> <span id="receiptName" class="font-bold text-slate-800"></span></div>
+                    <div class="flex justify-between items-center mt-2 pt-2 border-t border-slate-200">
+                        <span class="text-slate-500 font-bold">Total Donated:</span> 
+                        <span class="font-extrabold text-lg text-primary">₹<span id="receiptAmount"></span></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-3">
+                <button onclick="downloadReceipt()" class="w-full bg-primary text-white py-3.5 rounded-xl font-bold hover:bg-emerald-700 transition flex justify-center items-center gap-2 shadow-lg shadow-emerald-600/20">
+                    <i class="fas fa-file-pdf"></i> Download PDF Receipt
+                </button>
+                <button onclick="closeSuccessModal()" class="w-full bg-slate-100 text-slate-700 py-3.5 rounded-xl font-bold hover:bg-slate-200 transition">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
     <footer class="bg-white border-t border-slate-100 pt-10 pb-10">
         <div class="max-w-4xl mx-auto px-4 text-center">
             <p class="text-slate-500 text-lg font-medium mb-6">&copy; 2026 KindFund Foundation. All rights reserved.</p>
@@ -135,7 +167,7 @@
     </footer>
 
     <script>
-        // --- Firebase Initialization ---
+        // --- Firebase Config ---
         const firebaseConfig = {
             apiKey: "AIzaSyBunVS2o_nEvQNtcz68VwNCUGBS0Qufi7E",
             authDomain: "kvadmin-a9a5d.firebaseapp.com",
@@ -148,30 +180,23 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
+        // --- Global State ---
+        let activeCampaignTitle = "General Fund"; 
+        let activeCampaignDesc = "Support our causes at KindFund.";
+        let currentReceiptData = {}; // Stores info for the PDF
+
         // Navbar scroll effect
         window.addEventListener('scroll', () => {
             const nav = document.getElementById('nav-container');
             window.scrollY > 20 ? nav.classList.add('glass-nav') : nav.classList.remove('glass-nav');
         });
 
-        // Global variables to store active campaign details for the share button
-        let activeCampaignTitle = "General Fund"; 
-        let activeCampaignDesc = "Support our causes at KindFund.";
-
-        // --- Dynamic Campaign Loader ---
+        // --- Fetch Live Campaign ---
         db.collection("campaigns").orderBy("timestamp", "desc").limit(1).onSnapshot((snapshot) => {
-            
-            const loadingState = document.getElementById('loading-state');
-            const emptyState = document.getElementById('empty-state');
-            const campaignContent = document.getElementById('campaign-content');
-
-            // Hide loading spinner
-            loadingState.classList.add('hidden');
-
+            document.getElementById('loading-state').classList.add('hidden');
             if (!snapshot.empty) {
-                // Show Content, Hide Empty State
-                emptyState.classList.add('hidden');
-                campaignContent.classList.remove('hidden');
+                document.getElementById('empty-state').classList.add('hidden');
+                document.getElementById('campaign-content').classList.remove('hidden');
 
                 const camp = snapshot.docs[0].data();
                 activeCampaignTitle = camp.title;
@@ -184,47 +209,34 @@
                 const goal = Number(camp.goalAmount) || 0;
                 document.getElementById('camp-goal').innerText = `of ₹${goal.toLocaleString('en-IN')} goal`;
 
-                // Fetch Donations
                 db.collection("donations").where("campaign", "==", camp.title).onSnapshot((donSnapshot) => {
                     let totalRaised = 0;
                     donSnapshot.forEach(doc => { totalRaised += Number(doc.data().amount); });
-                    
                     document.getElementById('camp-raised').innerText = `₹${totalRaised.toLocaleString('en-IN')}`;
-                    
-                    let progressPercent = 0;
-                    if(goal > 0) progressPercent = Math.min((totalRaised / goal) * 100, 100);
+                    let progressPercent = goal > 0 ? Math.min((totalRaised / goal) * 100, 100) : 0;
                     document.getElementById('camp-progress').style.width = `${progressPercent}%`;
                 });
-
             } else {
-                // Show Empty State, Hide Content
-                campaignContent.classList.add('hidden');
-                emptyState.classList.remove('hidden');
+                document.getElementById('campaign-content').classList.add('hidden');
+                document.getElementById('empty-state').classList.remove('hidden');
             }
         });
 
-        // --- Share Campaign Logic ---
+        // --- Share Action ---
         function shareCampaign() {
             const shareData = {
                 title: activeCampaignTitle + ' - KindFund',
                 text: 'Please consider donating: ' + activeCampaignTitle + ' - ' + activeCampaignDesc.substring(0, 100) + '...',
                 url: window.location.href
             };
-
             if (navigator.share) {
-                // For Mobile / Supported Browsers (Opens native Share sheet)
-                navigator.share(shareData).catch((error) => console.log('Error sharing', error));
+                navigator.share(shareData).catch(console.log);
             } else {
-                // Fallback for Desktop Browsers (Copies URL to Clipboard)
-                navigator.clipboard.writeText(window.location.href).then(() => {
-                    alert("✅ Campaign link copied to your clipboard! Thank you for sharing.");
-                }).catch(err => {
-                    alert("Please manually copy the URL from your browser address bar to share.");
-                });
+                navigator.clipboard.writeText(window.location.href).then(() => alert("✅ Link copied!"));
             }
         }
 
-        // --- Razorpay & Firebase Integration ---
+        // --- Razorpay Payment ---
         function openRazorpay() {
             const name = document.getElementById('donorName').value.trim();
             const phone = document.getElementById('donorPhone').value.trim();
@@ -235,46 +247,129 @@
                 return;
             }
 
-            let amountInPaise = amount * 100; 
+            const btn = document.getElementById('payBtn');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            btn.disabled = true;
 
             var options = {
                 "key": "rzp_test_SIkLAdWQzf9tHw", 
-                "amount": amountInPaise,
+                "amount": amount * 100,
                 "currency": "INR",
                 "name": "KindFund Foundation",
                 "description": `Donation for ${activeCampaignTitle}`,
                 "image": "https://i.ibb.co/svMHRcFF/Green-Modern-Badge-Gardening-Logo-Design-20260202-115512-0000.png",
                 "handler": function (response) {
-                    
-                    const btn = document.getElementById('payBtn');
-                    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
-                    
+                    const todayDate = new Date().toLocaleDateString('en-IN');
+
+                    // Save to Firebase
                     db.collection('donations').add({
-                        name: name,
-                        phone: phone,
-                        amount: Number(amount),
-                        method: 'Online (Razorpay)',
-                        paymentId: response.razorpay_payment_id,
-                        campaign: activeCampaignTitle, 
-                        date: new Date().toISOString().split('T')[0],
+                        name: name, phone: phone, amount: Number(amount),
+                        method: 'Online (Razorpay)', paymentId: response.razorpay_payment_id,
+                        campaign: activeCampaignTitle, date: new Date().toISOString().split('T')[0],
                         timestamp: firebase.firestore.FieldValue.serverTimestamp()
                     }).then(() => {
-                        alert(`Thank you ${name}! Your payment of ₹${amount} was successful.\nPayment ID: ${response.razorpay_payment_id}`);
+                        // Store Data for PDF
+                        currentReceiptData = {
+                            id: response.razorpay_payment_id,
+                            name: name,
+                            amount: Number(amount).toLocaleString('en-IN'),
+                            campaign: activeCampaignTitle,
+                            date: todayDate
+                        };
+
+                        // Populate & Show Modal
+                        document.getElementById('successMessage').innerText = `Thank you ${name}! Your donation makes a real difference.`;
+                        document.getElementById('receiptId').innerText = response.razorpay_payment_id;
+                        document.getElementById('receiptName').innerText = name;
+                        document.getElementById('receiptAmount').innerText = Number(amount).toLocaleString('en-IN');
+                        
+                        document.getElementById('successModal').classList.remove('hidden');
+                        setTimeout(() => document.getElementById('successModalContent').classList.remove('scale-95'), 50);
+
+                        // Reset Form
                         document.getElementById('donorName').value = '';
                         document.getElementById('donorPhone').value = '';
-                        btn.innerHTML = '<span>Donate via Razorpay</span><i class="fas fa-heart text-red-500 animate-pulse-slow"></i>';
-                    }).catch((error) => {
-                        console.error("Error saving donation: ", error);
-                        alert("Payment successful, but error recording it. Contact support.");
-                        btn.innerHTML = '<span>Donate via Razorpay</span><i class="fas fa-heart text-red-500 animate-pulse-slow"></i>';
+                        resetBtn();
+                    }).catch(error => {
+                        console.error(error); alert("Payment succeeded, but we couldn't save the record. Contact support."); resetBtn();
                     });
                 },
                 "prefill": { "name": name, "contact": phone },
                 "theme": { "color": "#059669" }
             };
+            
             var rzp1 = new Razorpay(options);
-            rzp1.on('payment.failed', function (response){ alert("Payment Failed: " + response.error.description); });
+            rzp1.on('payment.failed', function (res){ 
+                alert("Payment Failed: " + res.error.description); 
+                resetBtn(); 
+            });
             rzp1.open();
+        }
+
+        function resetBtn() {
+            const btn = document.getElementById('payBtn');
+            btn.innerHTML = '<span>Donate via Razorpay</span><i class="fas fa-heart text-red-500 animate-pulse-slow"></i>';
+            btn.disabled = false;
+        }
+
+        function closeSuccessModal() {
+            document.getElementById('successModalContent').classList.add('scale-95');
+            setTimeout(() => document.getElementById('successModal').classList.add('hidden'), 300);
+        }
+
+        // --- Generate PDF Receipt ---
+        function downloadReceipt() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // Header
+            doc.setFillColor(5, 150, 105);
+            doc.rect(0, 0, 210, 40, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(24);
+            doc.setFont("helvetica", "bold");
+            doc.text("KindFund Foundation", 105, 20, null, null, "center");
+            doc.setFontSize(12);
+            doc.setFont("helvetica", "normal");
+            doc.text("Official Donation Receipt", 105, 30, null, null, "center");
+
+            // Content
+            doc.setTextColor(50, 50, 50);
+            doc.setFontSize(11);
+            doc.text(`Date: ${currentReceiptData.date}`, 20, 60);
+            doc.text(`Receipt ID: ${currentReceiptData.id}`, 20, 70);
+
+            doc.setDrawColor(200, 200, 200);
+            doc.line(20, 75, 190, 75);
+
+            doc.setFontSize(12);
+            doc.text(`Received with thanks from:`, 20, 90);
+            doc.setFontSize(14);
+            doc.setFont("helvetica", "bold");
+            doc.text(`${currentReceiptData.name}`, 20, 100);
+            
+            doc.setFontSize(12);
+            doc.setFont("helvetica", "normal");
+            doc.text(`Towards Campaign:`, 20, 115);
+            doc.setFont("helvetica", "bold");
+            doc.text(`${currentReceiptData.campaign}`, 20, 125);
+
+            // Amount Box
+            doc.setFillColor(240, 253, 244);
+            doc.setDrawColor(5, 150, 105);
+            doc.roundedRect(20, 140, 170, 25, 3, 3, 'FD');
+            doc.setFontSize(16);
+            doc.setTextColor(5, 150, 105);
+            doc.text(`Total Amount: Rs. ${currentReceiptData.amount}`, 105, 156, null, null, "center");
+
+            // Footer
+            doc.setTextColor(120, 120, 120);
+            doc.setFontSize(10);
+            doc.setFont("helvetica", "italic");
+            doc.text("Thank you for your generous contribution. Your support changes lives.", 105, 260, null, null, "center");
+            doc.text("This is a computer generated receipt and does not require a signature.", 105, 266, null, null, "center");
+
+            doc.save(`KindFund_Receipt_${currentReceiptData.id}.pdf`);
         }
     </script>
 </body>
